@@ -28,8 +28,8 @@ RUN apt-get install -y -q --no-install-recommends \
     python-setuptools \
     subversion
 
-RUN useradd -m -d /galaxy -p galaxy galaxy  # TODO actually use this
-
+# Create an unprivileged user for Galaxy to run as (and its home directory).
+RUN useradd -m -d /galaxy -p galaxy galaxy
 WORKDIR /galaxy
 
 # Fetch the latest source tarball from galaxy-central's stable branch.
@@ -37,21 +37,27 @@ RUN apt-get install -y -q --no-install-recommends wget
 RUN mkdir stable && \
     wget -qO- https://bitbucket.org/galaxy/galaxy-central/get/stable.tar.gz | \
     tar xvz --strip-components=1 -C stable
+RUN chown -R galaxy:www-data stable
+
+# Install gosu, a lightweight su
+RUN wget -qO /usr/local/bin/gosu 'https://github.com/tianon/gosu/releases/download/1.0/gosu' && \
+    chmod +x /usr/local/bin/gosu
 
 # Fire up a virtualenv to isolate Galaxy from system python.
-RUN apt-get install -y -q python-pip
-RUN pip install virtualenv
-RUN virtualenv --no-site-packages galaxy-env && \
-    . galaxy-env/bin/activate
+RUN apt-get install -y -q python-pip && \
+    pip install virtualenv
+RUN gosu galaxy virtualenv /galaxy/galaxy-env
 
 WORKDIR /galaxy/stable
 
 # No-nonsense configuration! But strip the comments first, for images
 # using us as a base.
-RUN egrep -v '^(#.*)?$' universe_wsgi.ini.sample > universe_wsgi.ini
+RUN egrep -v '^(#.*)?$' universe_wsgi.ini.sample > universe_wsgi.ini && \
+    chown galaxy:www-data universe_wsgi.ini
 
 # Fetch dependencies.
-RUN python scripts/fetch_eggs.py
+RUN python scripts/fetch_eggs.py && \
+    chown -R galaxy:www-data eggs
 
 # Install and configure nginx to proxy requests.
 RUN apt-get install -y -q --no-install-recommends nginx
