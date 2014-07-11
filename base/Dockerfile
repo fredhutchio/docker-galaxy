@@ -1,5 +1,5 @@
 FROM debian:jessie
-ENV REFRESHED_AT 2014-07-05
+ENV REFRESHED_AT 2014-07-10
 
 MAINTAINER Brian Claywell <bclaywel@fhcrc.org>
 
@@ -39,11 +39,11 @@ RUN mkdir stable && \
     tar xvz --strip-components=1 -C stable
 RUN chown -R galaxy:www-data stable
 
-# Install gosu, a lightweight su
+# Install gosu, a lightweight su.
 RUN wget -qO /usr/local/bin/gosu 'https://github.com/tianon/gosu/releases/download/1.0/gosu' && \
     chmod +x /usr/local/bin/gosu
 
-# Fire up a virtualenv to isolate Galaxy from system python.
+# Create a virtualenv to isolate Galaxy from system python.
 RUN apt-get install -y -q python-pip && \
     pip install virtualenv
 RUN gosu galaxy virtualenv /galaxy/galaxy-env
@@ -63,7 +63,7 @@ RUN python scripts/fetch_eggs.py && \
 RUN apt-get install -y -q --no-install-recommends nginx
 ADD nginx.conf /etc/nginx/nginx.conf
 
-# Uncomment this line if nginx shouldn't fork into the background
+# Uncomment this line if nginx shouldn't fork into the background.
 # (i.e. if startup.sh changes).
 #RUN sed -i '1idaemon off;' /etc/nginx/nginx.conf
 
