@@ -52,12 +52,17 @@ WORKDIR /galaxy/stable
 
 # No-nonsense configuration! But strip the comments first, for images
 # using us as a base.
-RUN egrep -v '^(#.*)?$' universe_wsgi.ini.sample > universe_wsgi.ini && \
+RUN sed -i 's/^#database_connection =/database_connection =/' universe_wsgi.ini.sample && \
+    egrep -v '^(#.*)?$' universe_wsgi.ini.sample > universe_wsgi.ini && \
     chown galaxy:www-data universe_wsgi.ini
 
 # Fetch dependencies.
 RUN python scripts/fetch_eggs.py && \
     chown -R galaxy:www-data eggs
+
+RUN mkdir /galaxy/.python-eggs && \
+    chown -R galaxy:galaxy /galaxy/.python-eggs
+ENV PYTHON_EGG_CACHE "/galaxy/.python-eggs"
 
 # Install and configure nginx to proxy requests.
 RUN apt-get install -y -q --no-install-recommends nginx
