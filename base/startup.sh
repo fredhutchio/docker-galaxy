@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+# usage: wait_for_ok http://example.com
 wait_for_ok() {
     echo -n "waiting for 200 OK..."
     until wget -qO /dev/null $1; do
@@ -17,11 +18,11 @@ wait_for_ok() {
 service nginx start
 
 cd /galaxy/stable
-test -z "$VIRTUAL_ENV" && source /galaxy/galaxy-env/bin/activate
+#test -z "$VIRTUAL_ENV" && source /galaxy/galaxy-env/bin/activate
 
-if [ -n "${DB_NAME}" ]; then
+if [[ -n "${DB_NAME}" ]]; then
     DB_CONN="postgresql://${DB_USER:=galaxy}:${DB_PASS:=galaxy}@${DB_PORT_5432_TCP_ADDR}:${DB_PORT_5432_TCP_PORT}/${DB_DATABASE:=galaxy}"
-    sed -i 's|^database_connection = .*$|database_connection = '${DB_CONN}'|' universe_wsgi.ini
+    sed -i 's|^#\?database_connection = .*$|database_connection = '${DB_CONN}'|' universe_wsgi.ini
 fi
 
-exec gosu galaxy sh run.sh
+exec su -c "sh run.sh" galaxy

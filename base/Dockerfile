@@ -1,5 +1,5 @@
 FROM debian:jessie
-ENV REFRESHED_AT 2014-07-10
+ENV REFRESHED_AT 2014-07-11
 
 MAINTAINER Brian Claywell <bclaywel@fhcrc.org>
 
@@ -32,37 +32,36 @@ RUN apt-get install -y -q --no-install-recommends \
 RUN useradd -m -d /galaxy -p galaxy galaxy
 WORKDIR /galaxy
 
-# Fetch the latest source tarball from galaxy-central's stable branch.
 RUN apt-get install -y -q --no-install-recommends wget
+#RUN apt-get install -y -q --no-install-recommends python-pip && \
+#    pip install virtualenv
+
+# Do as much as work possible as the unprivileged galaxy user.
+WORKDIR /galaxy
+USER galaxy
+
+# Fetch the latest source tarball from galaxy-central's stable branch.
 RUN mkdir stable && \
     wget -qO- https://bitbucket.org/galaxy/galaxy-central/get/stable.tar.gz | \
-    tar xvz --strip-components=1 -C stable
-RUN chown -R galaxy:www-data stable
-
-# Install gosu, a lightweight su.
-RUN wget -qO /usr/local/bin/gosu 'https://github.com/tianon/gosu/releases/download/1.0/gosu' && \
-    chmod +x /usr/local/bin/gosu
+    tar xvpz --strip-components=1 -C stable
 
 # Create a virtualenv to isolate Galaxy from system python.
-RUN apt-get install -y -q python-pip && \
-    pip install virtualenv
-RUN gosu galaxy virtualenv /galaxy/galaxy-env
+#RUN virtualenv /galaxy/galaxy-env
 
 WORKDIR /galaxy/stable
 
-# No-nonsense configuration! But strip the comments first, for images
-# using us as a base.
-RUN sed -i 's/^#database_connection =/database_connection =/' universe_wsgi.ini.sample && \
-    egrep -v '^(#.*)?$' universe_wsgi.ini.sample > universe_wsgi.ini && \
-    chown galaxy:www-data universe_wsgi.ini
+# No-nonsense configuration!
+RUN cp universe_wsgi.ini.sample universe_wsgi.ini
 
 # Fetch dependencies.
-RUN python scripts/fetch_eggs.py && \
-    chown -R galaxy:www-data eggs
+RUN python scripts/fetch_eggs.py
 
-RUN mkdir /galaxy/.python-eggs && \
-    chown -R galaxy:galaxy /galaxy/.python-eggs
-ENV PYTHON_EGG_CACHE "/galaxy/.python-eggs"
+# Explicitly set this so it won't look in /.python-eggs.
+RUN mkdir /galaxy/.python-eggs
+ENV PYTHON_EGG_CACHE /galaxy/.python-eggs
+
+# Switch back to root for the rest of the configuration.
+USER root
 
 # Install and configure nginx to proxy requests.
 RUN apt-get install -y -q --no-install-recommends nginx
