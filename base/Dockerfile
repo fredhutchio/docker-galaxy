@@ -64,8 +64,19 @@ ENV PYTHON_EGG_CACHE /galaxy/.python-eggs
 USER root
 
 # Install and configure nginx to proxy requests.
-RUN apt-get install -y -q --no-install-recommends nginx
+RUN apt-get install -y -q --no-install-recommends nginx-light
 ADD nginx.conf /etc/nginx/nginx.conf
+
+# Offload uploads to nginx.
+#RUN mkdir /galaxy/upload_store && \
+#    chown galaxy:www-data /galaxy/upload_store && \
+#    chmod 770 /galaxy/upload_store && \
+#    sed -i 's|^#\?nginx_upload_store .*$|nginx_upload_store = /galaxy/upload_store|' universe_wsgi.ini && \
+#    sed -i 's|^#\?nginx_upload_path .*$|nginx_upload_path = /_upload|' universe_wsgi.ini
+
+# Offload downloads and compression to nginx.
+RUN sed -i 's|^#\?nginx_x_accel_redirect_base .*$|nginx_x_accel_redirect_base = /_x_accel_redirect|' universe_wsgi.ini && \
+    sed -i 's|^#\?nginx_x_archive_files_base .*$|nginx_x_archive_files_base = /_x_accel_redirect|' universe_wsgi.ini
 
 # Uncomment this line if nginx shouldn't fork into the background.
 # (i.e. if startup.sh changes).
