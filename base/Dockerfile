@@ -56,6 +56,9 @@ RUN cp universe_wsgi.ini.sample universe_wsgi.ini
 # Fetch dependencies.
 RUN python scripts/fetch_eggs.py
 
+# Ape the basic job_conf.xml.
+RUN cp job_conf.xml.sample_basic job_conf.xml
+
 # Explicitly set this so it won't look in /.python-eggs.
 RUN mkdir /galaxy/.python-eggs
 ENV PYTHON_EGG_CACHE /galaxy/.python-eggs
