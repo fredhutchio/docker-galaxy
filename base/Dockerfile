@@ -56,6 +56,11 @@ RUN cp universe_wsgi.ini.sample universe_wsgi.ini
 # Fetch dependencies.
 RUN python scripts/fetch_eggs.py
 
+# Configure toolsheds. See https://wiki.galaxyproject.org/InstallingRepositoriesToGalaxy
+RUN mkdir ../shed_tools ../tool_deps && \
+    cp shed_tool_conf.xml.sample shed_tool_conf.xml && \
+    sed -i 's|^#\?tool_dependency_dir .*$|tool_dependency_dir = ../tool_deps|' universe_wsgi.ini
+
 # Ape the basic job_conf.xml.
 RUN cp job_conf.xml.sample_basic job_conf.xml
 
