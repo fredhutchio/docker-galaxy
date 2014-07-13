@@ -25,4 +25,8 @@ if [[ -n "${DB_NAME}" ]]; then
     sed -i 's|^#\?database_connection = .*$|database_connection = '${DB_CONN}'|' universe_wsgi.ini
 fi
 
+if [[ -n "${GALAXY_ADMINS}" ]]; then
+    sed -i 's|^#\?admin_users = .*$|admin_users = '${GALAXY_ADMINS}'|' universe_wsgi.ini
+fi
+
 exec su -c "sh run.sh" galaxy
