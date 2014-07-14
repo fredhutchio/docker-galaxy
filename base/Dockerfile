@@ -90,6 +90,9 @@ RUN sed -i 's|^#\?nginx_x_accel_redirect_base .*$|nginx_x_accel_redirect_base = 
 # (i.e. if startup.sh changes).
 #RUN sed -i '1idaemon off;' /etc/nginx/nginx.conf
 
+# Add missing dependencies.
+RUN apt-get install -y -q --no-install-recommends libz-dev
+
 # Set debconf back to normal.
 RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
 
