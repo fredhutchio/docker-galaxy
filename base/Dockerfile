@@ -40,7 +40,7 @@ WORKDIR /galaxy
 USER galaxy
 
 RUN mkdir -p tools stable/database
-VOLUME ["/galaxy/tools", "galaxy/stable/database"]
+VOLUME ["/galaxy/tools", "/galaxy/stable/database", "/galaxy/stable/tool-data"]
 
 # Fetch the latest source tarball from galaxy-central's stable branch.
 RUN wget -qO- https://bitbucket.org/galaxy/galaxy-central/get/stable.tar.gz | \
