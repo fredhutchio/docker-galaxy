@@ -22,11 +22,13 @@ cd /galaxy/stable
 
 if [[ -n "${DB_NAME}" ]]; then
     DB_CONN="postgresql://${DB_USER:=galaxy}:${DB_PASS:=galaxy}@${DB_PORT_5432_TCP_ADDR}:${DB_PORT_5432_TCP_PORT}/${DB_DATABASE:=galaxy}"
-    sed -i 's|^#\?database_connection = .*$|database_connection = '${DB_CONN}'|' universe_wsgi.ini
+    sed -i 's|^#\?\(database_connection\) = .*$|\1 = '${DB_CONN}'|' universe_wsgi.ini
+    sed -i 's|^#\?\(database_engine_option_server_side_cursors\) = .*$|\1 = True|' universe_wsgi.ini
+    sed -i 's|^#\?\(database_engine_option_strategy\) = .*$|\1 = threadlocal|' universe_wsgi.ini
 fi
 
 if [[ -n "${GALAXY_ADMINS}" ]]; then
-    sed -i 's|^#\?admin_users = .*$|admin_users = '${GALAXY_ADMINS}'|' universe_wsgi.ini
+    sed -i 's|^#\?\(admin_users\) = .*$|\1 = '${GALAXY_ADMINS}'|' universe_wsgi.ini
 fi
 
 # If the database or tool-data directories are empty (e.g., if a new
