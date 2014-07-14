@@ -39,8 +39,8 @@ RUN apt-get install -y -q --no-install-recommends wget
 WORKDIR /galaxy
 USER galaxy
 
-RUN mkdir -p tools stable/database
-VOLUME ["/galaxy/tools", "/galaxy/stable/database", "/galaxy/stable/tool-data"]
+# Attach volumes.
+RUN mkdir -p tools stable/database stable/tool-data
 
 # Fetch the latest source tarball from galaxy-central's stable branch.
 RUN wget -qO- https://bitbucket.org/galaxy/galaxy-central/get/stable.tar.gz | \
@@ -50,6 +50,10 @@ RUN wget -qO- https://bitbucket.org/galaxy/galaxy-central/get/stable.tar.gz | \
 #RUN virtualenv /galaxy/galaxy-env
 
 WORKDIR /galaxy/stable
+
+# Tar up the database and tool-data directory skeletons for bootstrapping empty volumes.
+RUN tar cvzpf database_skel.tar.gz database && \
+    tar cvzpf tool-data_skel.tar.gz tool-data
 
 # No-nonsense configuration!
 RUN cp universe_wsgi.ini.sample universe_wsgi.ini
@@ -101,6 +105,7 @@ RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
 
 ADD startup.sh /startup
 
+VOLUME ["/galaxy/tools", "/galaxy/stable/database", "/galaxy/stable/tool-data"]
 EXPOSE 80
 
 CMD ["/startup"]

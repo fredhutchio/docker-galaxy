@@ -29,4 +29,15 @@ if [[ -n "${GALAXY_ADMINS}" ]]; then
     sed -i 's|^#\?admin_users = .*$|admin_users = '${GALAXY_ADMINS}'|' universe_wsgi.ini
 fi
 
+# If the database or tool-data directories are empty (e.g., if a new
+# volume was passed to `docker run`, initialize them from skeletons.
+
+if [[ -z "$(ls -A /galaxy/stable/database)" ]]; then
+    tar xvpf database_skel.tar.gz
+fi
+
+if [[ -z "$(ls -A /galaxy/stable/tool-data)" ]]; then
+    tar xvpf tool-data_skel.tar.gz
+fi
+
 exec su -c "sh run.sh" galaxy
