@@ -75,6 +75,9 @@ USER root
 RUN apt-get install -y -q --no-install-recommends nginx-light
 ADD nginx.conf /etc/nginx/nginx.conf
 
+# Static content will be handled by nginx, so disable it in Galaxy.
+RUN sed -i 's|^#\?\(static_enabled\) = .*$|\1 = False|' universe_wsgi.ini
+
 # Offload uploads to nginx.
 #RUN mkdir /galaxy/upload_store && \
 #    chown galaxy:www-data /galaxy/upload_store && \
