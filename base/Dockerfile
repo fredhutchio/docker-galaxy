@@ -30,7 +30,6 @@ RUN apt-get install -y -q --no-install-recommends \
 
 # Create an unprivileged user for Galaxy to run as (and its home directory).
 RUN useradd -m -d /galaxy -p galaxy galaxy
-WORKDIR /galaxy
 
 RUN apt-get install -y -q --no-install-recommends wget
 #RUN apt-get install -y -q --no-install-recommends python-pip && \
@@ -40,9 +39,11 @@ RUN apt-get install -y -q --no-install-recommends wget
 WORKDIR /galaxy
 USER galaxy
 
+RUN mkdir -p tools stable/database
+VOLUME ["/galaxy/tools", "galaxy/stable/database"]
+
 # Fetch the latest source tarball from galaxy-central's stable branch.
-RUN mkdir stable && \
-    wget -qO- https://bitbucket.org/galaxy/galaxy-central/get/stable.tar.gz | \
+RUN wget -qO- https://bitbucket.org/galaxy/galaxy-central/get/stable.tar.gz | \
     tar xvpz --strip-components=1 -C stable
 
 # Create a virtualenv to isolate Galaxy from system python.
@@ -57,9 +58,8 @@ RUN cp universe_wsgi.ini.sample universe_wsgi.ini
 RUN python scripts/fetch_eggs.py
 
 # Configure toolsheds. See https://wiki.galaxyproject.org/InstallingRepositoriesToGalaxy
-RUN mkdir ../shed_tools ../tool_deps && \
-    cp shed_tool_conf.xml.sample shed_tool_conf.xml && \
-    sed -i 's|^#\?tool_dependency_dir .*$|tool_dependency_dir = ../tool_deps|' universe_wsgi.ini
+RUN sed    's|\.\./shed_tools|../tools/shed_tools|' shed_tool_conf.xml.sample > shed_tool_conf.xml && \
+    sed -i 's|^#\?tool_dependency_dir .*$|tool_dependency_dir = ../tools/tool_deps|' universe_wsgi.ini
 
 # Ape the basic job_conf.xml.
 RUN cp job_conf.xml.sample_basic job_conf.xml
@@ -96,8 +96,5 @@ RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
 ADD startup.sh /startup
 
 EXPOSE 80
-
-# Expose Galaxy's database directory.
-VOLUME ["/galaxy/stable/database"]
 
 CMD ["/startup"]
