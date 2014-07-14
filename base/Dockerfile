@@ -59,7 +59,7 @@ RUN python scripts/fetch_eggs.py
 
 # Configure toolsheds. See https://wiki.galaxyproject.org/InstallingRepositoriesToGalaxy
 RUN sed    's|\.\./shed_tools|../tools/shed_tools|' shed_tool_conf.xml.sample > shed_tool_conf.xml && \
-    sed -i 's|^#\?tool_dependency_dir .*$|tool_dependency_dir = ../tools/tool_deps|' universe_wsgi.ini
+    sed -i 's|^#\?\(tool_dependency_dir\) = .*$|\1 = ../tools/tool_deps|' universe_wsgi.ini
 
 # Ape the basic job_conf.xml.
 RUN cp job_conf.xml.sample_basic job_conf.xml
@@ -79,12 +79,12 @@ ADD nginx.conf /etc/nginx/nginx.conf
 #RUN mkdir /galaxy/upload_store && \
 #    chown galaxy:www-data /galaxy/upload_store && \
 #    chmod 770 /galaxy/upload_store && \
-#    sed -i 's|^#\?nginx_upload_store .*$|nginx_upload_store = /galaxy/upload_store|' universe_wsgi.ini && \
-#    sed -i 's|^#\?nginx_upload_path .*$|nginx_upload_path = /_upload|' universe_wsgi.ini
+#    sed -i 's|^#\?\(nginx_upload_store\) = .*$|\1 = /galaxy/upload_store|' universe_wsgi.ini && \
+#    sed -i 's|^#\?\(nginx_upload_path\) = .*$|\1 = /_upload|' universe_wsgi.ini
 
 # Offload downloads and compression to nginx.
-RUN sed -i 's|^#\?nginx_x_accel_redirect_base .*$|nginx_x_accel_redirect_base = /_x_accel_redirect|' universe_wsgi.ini && \
-    sed -i 's|^#\?nginx_x_archive_files_base .*$|nginx_x_archive_files_base = /_x_accel_redirect|' universe_wsgi.ini
+RUN sed -i 's|^#\?\(nginx_x_accel_redirect_base\) = .*$|\1 = /_x_accel_redirect|' universe_wsgi.ini && \
+    sed -i 's|^#\?\(nginx_x_archive_files_base\) = .*$|\1 = /_x_accel_redirect|' universe_wsgi.ini
 
 # Uncomment this line if nginx shouldn't fork into the background.
 # (i.e. if startup.sh changes).
