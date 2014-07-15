@@ -20,6 +20,7 @@ service nginx start
 cd /galaxy/stable
 #test -z "$VIRTUAL_ENV" && source /galaxy/galaxy-env/bin/activate
 
+# Configure a postgres db if $DB_NAME is set.
 if [[ -n "${DB_NAME}" ]]; then
     DB_CONN="postgresql://${DB_USER:=galaxy}:${DB_PASS:=galaxy}@${DB_PORT_5432_TCP_ADDR}:${DB_PORT_5432_TCP_PORT}/${DB_DATABASE:=galaxy}"
     sed -i 's|^#\?\(database_connection\) = .*$|\1 = '${DB_CONN}'|' universe_wsgi.ini
@@ -27,6 +28,7 @@ if [[ -n "${DB_NAME}" ]]; then
     sed -i 's|^#\?\(database_engine_option_strategy\) = .*$|\1 = threadlocal|' universe_wsgi.ini
 fi
 
+# Configure Galaxy admin users if $GALAXY_ADMINS is set.
 if [[ -n "${GALAXY_ADMINS}" ]]; then
     sed -i 's|^#\?\(admin_users\) = .*$|\1 = '${GALAXY_ADMINS}'|' universe_wsgi.ini
 fi
@@ -42,4 +44,5 @@ if [[ -z "$(ls -A /galaxy/stable/tool-data)" ]]; then
     tar xvpf tool-data_skel.tar.gz
 fi
 
+# Replace this shell with the new Galaxy process.
 exec su -c "sh run.sh" galaxy
