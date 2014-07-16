@@ -1,6 +1,22 @@
 #!/bin/bash
 set -e
 
+# "Production"-style docker-galaxy entrypoint
+#
+# Galaxy in its default configuration has a tendency to hang for a bit
+# when e.g. submitting complex workflow jobs because of the Python
+# GIL. Galaxy's way around that is to spawn dedicated web and job
+# handlers. This script makes it easy to spawn these processes, as
+# well as the mountpoint hooks and barebones nginx load balancer in
+# front of the web processes from the base image, inside the
+# container.
+#
+# The excess of scripting is because I'd rather avoid including the
+# config files themselves in this repo, instead preferring to modify
+# the default config one line at a time in either the Dockerfile
+# (baking the change into the image) or the docker entrypoint script
+# (making the change as needed just before starting the server).
+
 # usage: galaxy_config database_connection "$DB_CONN"
 galaxy_config() {
     sed -i 's|^#\?\('"$1"'\) = .*$|\1 = '"$2"'|' /galaxy/stable/universe_wsgi.ini
