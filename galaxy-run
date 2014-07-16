@@ -1,0 +1,34 @@
+#!/bin/bash
+set -eux
+
+docker build -t bcclaywell/galaxy-base:testing base
+docker build -t bcclaywell/galaxy-production:testing production
+
+VOLUME_OPTS=""
+
+if [[ -e mnt/database ]]; then
+    VOLUME_OPTS="${VOLUME_OPTS} -v ${PWD}/mnt/database:/galaxy/stable/database"
+fi
+
+if [[ -e mnt/tool-data ]]; then
+    VOLUME_OPTS="${VOLUME_OPTS} -v ${PWD}/mnt/tool-data:/galaxy/stable/tool-data"
+fi
+
+if [[ -e mnt/tools ]]; then
+    VOLUME_OPTS="${VOLUME_OPTS} -v ${PWD}/mnt/tools:/galaxy/tools"
+fi
+
+#if [[ -e mnt/shared ]]; then
+#    VOLUME_OPTS="${VOLUME_OPTS} -v ${PWD}/mnt/shared:/shared"
+#fi
+
+IMAGE=$1
+shift
+
+# FIXME VOLUME_OPTS removed for testing
+exec docker run -it --rm \
+    -p 80:80 \
+    --link db:db \
+    -e "GALAXY_ADMINS=bclaywel@fhcrc.org" \
+    ${IMAGE} \
+    $@
