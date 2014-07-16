@@ -21,7 +21,6 @@ RUN apt-get install -y -q --no-install-recommends \
     libatlas-base-dev \
     libblas-dev \
     liblapack-dev \
-    libz-dev \
     mercurial \
     openjdk-7-jre-headless \
     pkg-config \
@@ -98,6 +97,11 @@ RUN sed -i 's|^#\?\(nginx_x_accel_redirect_base\) = .*$|\1 = /_x_accel_redirect|
 # Uncomment this line if nginx shouldn't fork into the background.
 # (i.e. if startup.sh changes).
 #RUN sed -i '1idaemon off;' /etc/nginx/nginx.conf
+
+# Add in some additional basic dependencies.
+RUN apt-get install -y -q --no-install-recommends \
+    libxml2-dev \
+    libz-dev
 
 # Set debconf back to normal.
 RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
