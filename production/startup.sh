@@ -128,6 +128,10 @@ for SERVER in ${GALAXY_SERVERS}; do
     echo "ok"
 done
 
+# Reconfigure nginx for the new web processes.
+# TODO dynamic
+sed -i 's|\(server 127\.0\.0\.1:8080;\)|\1 server 127.0.0.1:8081;|' /etc/nginx/nginx.conf
+
 # Trap a few signals so we can try to shut down cleanly.
 trap '{ echo -n "Shutting down... "; pkill -INT -f paster.py; sleep 10; echo " ok"; exit 0; }' SIGINT SIGTERM EXIT
 tail -f web*.log worker*.log
