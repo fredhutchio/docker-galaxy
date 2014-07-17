@@ -29,6 +29,5 @@ shift
 exec docker run -it --rm \
     -p 80:80 \
     --link db:db \
-    -e "GALAXY_ADMINS=bclaywel@fhcrc.org" \
     ${IMAGE} \
     $@
