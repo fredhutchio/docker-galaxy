@@ -18,16 +18,12 @@ if [[ -e mnt/tools ]]; then
     VOLUME_OPTS="${VOLUME_OPTS} -v ${PWD}/mnt/tools:/galaxy/tools"
 fi
 
-#if [[ -e mnt/shared ]]; then
-#    VOLUME_OPTS="${VOLUME_OPTS} -v ${PWD}/mnt/shared:/shared"
-#fi
+if [[ -e mnt/shared ]]; then
+    VOLUME_OPTS="${VOLUME_OPTS} -v ${PWD}/mnt/shared:/shared"
+fi
 
-IMAGE=$1
-shift
-
-# FIXME VOLUME_OPTS removed for testing
 exec docker run -it --rm \
     -p 80:80 \
     --link db:db \
-    ${IMAGE} \
+    ${VOLUME_OPTS} \
     $@
