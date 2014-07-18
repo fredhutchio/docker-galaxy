@@ -141,8 +141,8 @@ else
     service nginx reload
 fi
 
-# Trap a few signals so we can try to shut down cleanly.
-trap '{ echo -n "Shutting down... "; pkill -INT -f paster.py; sleep 10; echo " ok"; exit 0; }' SIGINT SIGTERM EXIT
+# Trap SIGINT so we can try to shut down cleanly.
+trap '{ echo -n "Shutting down... "; pkill -INT -f paster.py; sleep 10; echo " ok"; exit 0; }' SIGINT EXIT
 tail -f web*.log worker*.log
 
 # Turn over this process to a shell for testing.
