@@ -24,6 +24,6 @@ fi
 
 exec docker run -it --rm \
     -p 80:80 \
-    --link db:db \
+    --link postgres:db \
     ${VOLUME_OPTS} \
     $@
