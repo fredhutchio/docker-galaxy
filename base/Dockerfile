@@ -7,11 +7,10 @@ MAINTAINER Brian Claywell <bclaywel@fhcrc.org>
 # https://github.com/phusion/baseimage-docker/issues/58#issuecomment-47995343
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
-RUN apt-get update -q
-
 # Install all requirements that are recommended by the Galaxy project.
 # (Keep an eye on them at https://wiki.galaxyproject.org/Admin/Config/ToolDependenciesList)
-RUN apt-get install -y -q --no-install-recommends \
+RUN apt-get update -q && \
+    apt-get install -y -q --no-install-recommends \
     autoconf \
     automake \
     build-essential \
