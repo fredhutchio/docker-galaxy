@@ -92,10 +92,14 @@ EOF
 }
 
 # TODO dynamic
-define_galaxy_server web0 8080 7 >> universe_wsgi.ini
-define_galaxy_server web1 8081 7 >> universe_wsgi.ini
-define_galaxy_server worker0 8090 5 >> universe_wsgi.ini
-define_galaxy_server worker1 8091 5 >> universe_wsgi.ini
+if grep -q web0 universe_wsgi.ini; then
+    echo "servers already defined in universe_wsgi.ini, skipping"
+else
+    define_galaxy_server web0 8080 7 >> universe_wsgi.ini
+    define_galaxy_server web1 8081 7 >> universe_wsgi.ini
+    define_galaxy_server worker0 8090 5 >> universe_wsgi.ini
+    define_galaxy_server worker1 8091 5 >> universe_wsgi.ini
+fi
 
 cat <<EOF > job_conf.xml
 <?xml version="1.0"?>
@@ -130,8 +134,12 @@ done
 
 # Reconfigure nginx for the new web processes.
 # TODO dynamic
-sed -i 's|\(server 127\.0\.0\.1:8080\);|\1; server 127.0.0.1:8081;|' /etc/nginx/nginx.conf
-service nginx reload
+if grep -q 'server 127\.0\.0\.1:8081' /etc/nginx/nginx.conf; then
+    echo "servers already defined in nginx.conf, skipping"
+else
+    sed -i 's|\(server 127\.0\.0\.1:8080\);|\1; server 127.0.0.1:8081;|' /etc/nginx/nginx.conf
+    service nginx reload
+fi
 
 # Trap a few signals so we can try to shut down cleanly.
 trap '{ echo -n "Shutting down... "; pkill -INT -f paster.py; sleep 10; echo " ok"; exit 0; }' SIGINT SIGTERM EXIT
