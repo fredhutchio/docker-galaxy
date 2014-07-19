@@ -18,7 +18,6 @@ wait_for_ok() {
 service nginx start
 
 cd /galaxy/stable
-#test -z "$VIRTUAL_ENV" && source /galaxy/galaxy-env/bin/activate
 
 # Configure a postgres db if $DB_NAME is set.
 if [[ -n "${DB_NAME}" ]]; then

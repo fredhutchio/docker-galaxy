@@ -31,8 +31,6 @@ RUN apt-get update -q && \
 RUN useradd -m -d /galaxy -p galaxy galaxy
 
 RUN apt-get install -y -q --no-install-recommends wget
-#RUN apt-get install -y -q --no-install-recommends python-pip && \
-#    pip install virtualenv
 
 # Do as much as work possible as the unprivileged galaxy user.
 WORKDIR /galaxy
@@ -44,9 +42,6 @@ RUN mkdir -p tools stable/database stable/tool-data
 # Fetch the latest source tarball from galaxy-central's stable branch.
 RUN wget -qO- https://bitbucket.org/galaxy/galaxy-central/get/stable.tar.gz | \
     tar xvpz --strip-components=1 -C stable
-
-# Create a virtualenv to isolate Galaxy from system python.
-#RUN virtualenv /galaxy/galaxy-env
 
 WORKDIR /galaxy/stable
 
