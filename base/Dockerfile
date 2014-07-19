@@ -82,13 +82,6 @@ ADD nginx.conf /etc/nginx/nginx.conf
 # Static content will be handled by nginx, so disable it in Galaxy.
 RUN sed -i 's|^#\?\(static_enabled\) = .*$|\1 = False|' universe_wsgi.ini
 
-# Offload uploads to nginx.
-#RUN mkdir /galaxy/upload_store && \
-#    chown galaxy:www-data /galaxy/upload_store && \
-#    chmod 770 /galaxy/upload_store && \
-#    sed -i 's|^#\?\(nginx_upload_store\) = .*$|\1 = /galaxy/upload_store|' universe_wsgi.ini && \
-#    sed -i 's|^#\?\(nginx_upload_path\) = .*$|\1 = /_upload|' universe_wsgi.ini
-
 # Offload downloads and compression to nginx.
 RUN sed -i 's|^#\?\(nginx_x_accel_redirect_base\) = .*$|\1 = /_x_accel_redirect|' universe_wsgi.ini && \
     sed -i 's|^#\?\(nginx_x_archive_files_base\) = .*$|\1 = /_x_accel_redirect|' universe_wsgi.ini
