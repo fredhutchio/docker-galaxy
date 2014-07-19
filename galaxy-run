@@ -2,7 +2,7 @@
 set -eux
 
 docker build -t bcclaywell/galaxy-base:testing base
-docker build -t bcclaywell/galaxy-production:testing production
+docker build -t bcclaywell/galaxy:testing production
 
 VOLUME_OPTS=""
 
@@ -26,4 +26,5 @@ exec docker run -it --rm \
     -p 80:80 \
     --link postgres:db \
     ${VOLUME_OPTS} \
+    bcclaywell/galaxy:testing \
     $@
