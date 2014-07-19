@@ -27,8 +27,13 @@ RUN apt-get update -q && \
     python-setuptools \
     subversion
 
-# Create an unprivileged user for Galaxy to run as (and its home directory).
-RUN useradd -m -d /galaxy -p galaxy galaxy
+# # Create an unprivileged user for Galaxy to run as (and its home
+# # directory). From man 8, useradd, "System users will be created
+# # with no aging information in /etc/shadow, and their numeric
+# # identifiers are chosen in the SYS_UID_MIN-SYS_UID_MAX range,
+# # defined in /etc/login.defs, instead of UID_MIN-UID_MAX (and their
+# # GID counterparts for the creation of groups)."
+RUN useradd --system -m -d /galaxy -p galaxy galaxy
 
 RUN apt-get install -y -q --no-install-recommends wget
 
