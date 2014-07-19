@@ -1,6 +1,17 @@
 #!/bin/bash
 set -e
 
+# Basic docker-galaxy entrypoint
+#
+# The base image is mostly self-contained. This script modifies a few
+# Galaxy defaults based on supplied environment variables, available
+# volumes, etc., and starts the services.
+
+# usage: galaxy_config database_connection "$DB_CONN"
+galaxy_config() {
+    sed -i 's|^#\?\('"$1"'\) = .*$|\1 = '"$2"'|' /galaxy/stable/universe_wsgi.ini
+}
+
 # usage: wait_for_ok http://example.com
 wait_for_ok() {
     echo -n "waiting for 200 OK..."
@@ -15,31 +26,38 @@ wait_for_ok() {
     echo " ok"
 }
 
+#####
+
 service nginx start
 
 cd /galaxy/stable
 
-# Configure a postgres db if $DB_NAME is set.
-if [[ -n "${DB_NAME}" ]]; then
+# Set up a connection string for a database on a linked container.
+# Default: postgresql://galaxy:galaxy@HOST:PORT/galaxy
+if [ -n "${DB_PORT_5432_TCP_ADDR}" ]; then
     DB_CONN="postgresql://${DB_USER:=galaxy}:${DB_PASS:=galaxy}@${DB_PORT_5432_TCP_ADDR}:${DB_PORT_5432_TCP_PORT}/${DB_DATABASE:=galaxy}"
-    sed -i 's|^#\?\(database_connection\) = .*$|\1 = '${DB_CONN}'|' universe_wsgi.ini
-    sed -i 's|^#\?\(database_engine_option_server_side_cursors\) = .*$|\1 = True|' universe_wsgi.ini
-    sed -i 's|^#\?\(database_engine_option_strategy\) = .*$|\1 = threadlocal|' universe_wsgi.ini
+fi
+
+# Configure a postgres db if $DB_CONN is set, here or otherwise.
+if [ -n "${DB_CONN}" ]; then
+    galaxy_config database_connection "${DB_CONN}"
+    galaxy_config database_engine_option_server_side_cursors "True"
+    galaxy_config database_engine_option_strategy "threadlocal"
 fi
 
 # Configure Galaxy admin users if $GALAXY_ADMINS is set.
-if [[ -n "${GALAXY_ADMINS}" ]]; then
-    sed -i 's|^#\?\(admin_users\) = .*$|\1 = '${GALAXY_ADMINS}'|' universe_wsgi.ini
+if [ -n "${GALAXY_ADMINS}" ]; then
+    galaxy_config admin_users "${GALAXY_ADMINS}"
 fi
 
 # If the database or tool-data directories are empty (e.g., if a new
 # volume was passed to `docker run`, initialize them from skeletons.
 
-if [[ -z "$(ls -A /galaxy/stable/database)" ]]; then
+if [ -z "$(ls -A /galaxy/stable/database)" ]; then
     tar xvpf database_skel.tar.gz
 fi
 
-if [[ -z "$(ls -A /galaxy/stable/tool-data)" ]]; then
+if [ -z "$(ls -A /galaxy/stable/tool-data)" ]; then
     tar xvpf tool-data_skel.tar.gz
 fi
 
