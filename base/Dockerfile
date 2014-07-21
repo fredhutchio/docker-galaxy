@@ -62,9 +62,14 @@ RUN cp universe_wsgi.ini.sample universe_wsgi.ini
 RUN python scripts/fetch_eggs.py
 
 # Configure toolsheds. See https://wiki.galaxyproject.org/InstallingRepositoriesToGalaxy
-RUN sed    's|\.\./shed_tools|../tools/shed_tools|' shed_tool_conf.xml.sample > shed_tool_conf.xml && \
-    sed    's|\.\./shed_tools|../tools/shed_tools|' migrated_tools_conf.xml.sample > migrated_tools_conf.xml && \
-    sed -i 's|^#\?\(tool_dependency_dir\) = .*$|\1 = ../tools/tool_deps|' universe_wsgi.ini
+# We'll fix ownership of these below, after switching back to root.
+ADD shed_tool_conf.xml /galaxy/tools/shed_tool_conf.xml
+ADD shed_tool_data_table_conf.xml /galaxy/tools/shed_tool_data_table_conf.xml
+RUN mkdir tools/shed_tools tools/tool_deps && \
+    touch tools/shed_tools/.keep tools/tool_deps/.keep
+RUN sed -i 's|^#\?\(tool_config_file\) = .*$|\1 = tool_conf.xml,../tools/shed_tool_conf.xml|' universe_wsgi.ini && \
+    sed -i 's|^#\?\(tool_dependency_dir\) = .*$|\1 = ../tools/tool_deps|' universe_wsgi.ini && \
+    sed -i 's|^#\?\(check_migrate_tools\) = .*$|\1 = False|' universe_wsgi.ini
 
 # Ape the basic job_conf.xml.
 RUN cp job_conf.xml.sample_basic job_conf.xml
