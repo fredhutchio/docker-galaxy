@@ -42,18 +42,22 @@ RUN useradd --system -m -d /galaxy -p galaxy galaxy
 WORKDIR /galaxy
 USER galaxy
 
-# Attach volumes.
-RUN mkdir -p tools stable/database stable/tool-data
+# Explicitly set this so it won't look in /.python-eggs.
+RUN mkdir .python-eggs
+ENV PYTHON_EGG_CACHE /galaxy/.python-eggs
+
+# Set up /galaxy.
+RUN mkdir tools
+
+RUN mkdir stable
+WORKDIR /galaxy/stable
+
+# Set up /galaxy/stable.
+RUN mkdir database static tool-data
 
 # Fetch the latest source tarball from galaxy-central's stable branch.
 RUN wget -qO- https://bitbucket.org/galaxy/galaxy-central/get/stable.tar.gz | \
-    tar xvpz --strip-components=1 -C stable
-
-WORKDIR /galaxy/stable
-
-# Tar up the database and tool-data directory skeletons for bootstrapping empty volumes.
-RUN tar cvzpf database_skel.tar.gz database && \
-    tar cvzpf tool-data_skel.tar.gz tool-data
+    tar xvpz --strip-components=1
 
 # No-nonsense configuration!
 RUN cp universe_wsgi.ini.sample universe_wsgi.ini
@@ -74,12 +78,17 @@ RUN sed -i 's|^#\?\(tool_config_file\) = .*$|\1 = tool_conf.xml,../tools/shed_to
 # Ape the basic job_conf.xml.
 RUN cp job_conf.xml.sample_basic job_conf.xml
 
-# Explicitly set this so it won't look in /.python-eggs.
-RUN mkdir /galaxy/.python-eggs
-ENV PYTHON_EGG_CACHE /galaxy/.python-eggs
-
 # Switch back to root for the rest of the configuration.
 USER root
+
+# Fix ownership of/in /galaxy/tools.
+RUN chown -R galaxy:galaxy /galaxy/tools
+
+# Tar up directory skeletons for bootstrapping empty volumes.
+RUN tar cvzpf tools_skel.tar.gz ../tools && \
+    tar cvzpf database_skel.tar.gz database && \
+    tar cvzpf static_skel.tar.gz static && \
+    tar cvzpf tool-data_skel.tar.gz tool-data
 
 # Install and configure nginx to proxy requests.
 RUN apt-get install -y -q --no-install-recommends nginx-light
@@ -106,7 +115,11 @@ RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
 
 ADD startup.sh /startup
 
-VOLUME ["/galaxy/tools", "/galaxy/stable/database", "/galaxy/stable/tool-data"]
+VOLUME /galaxy/tools
+VOLUME /galaxy/stable/database
+VOLUME /galaxy/stable/static
+VOLUME /galaxy/stable/tool-data
+
 EXPOSE 80
 
 CMD ["/startup"]

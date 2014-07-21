@@ -1,8 +1,7 @@
 #!/bin/bash
 set -eux
 
-docker build -t bcclaywell/galaxy-base:testing base
-docker build -t bcclaywell/galaxy:testing production
+make
 
 VOLUME_OPTS=""
 
@@ -18,8 +17,8 @@ if [[ -e mnt/tools ]]; then
     VOLUME_OPTS="${VOLUME_OPTS} -v ${PWD}/mnt/tools:/galaxy/tools"
 fi
 
-if [[ -e mnt/shared ]]; then
-    VOLUME_OPTS="${VOLUME_OPTS} -v ${PWD}/mnt/shared:/shared"
+if [[ -e mnt/static ]]; then
+    VOLUME_OPTS="${VOLUME_OPTS} -v ${PWD}/mnt/static:/galaxy/stable/static"
 fi
 
 exec docker run -it --rm \

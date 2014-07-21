@@ -53,8 +53,16 @@ fi
 # If a volume directory is empty (e.g., if a new volume was
 # passed to `docker run`), initialize it from a skeleton.
 
+if [ -z "$(ls -A /galaxy/tools)" ]; then
+    tar xvpf tools_skel.tar.gz -C /galaxy
+fi
+
 if [ -z "$(ls -A /galaxy/stable/database)" ]; then
     tar xvpf database_skel.tar.gz
+fi
+
+if [ -z "$(ls -A /galaxy/stable/static)" ]; then
+    tar xvpf static_skel.tar.gz
 fi
 
 if [ -z "$(ls -A /galaxy/stable/tool-data)" ]; then
