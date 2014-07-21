@@ -60,8 +60,8 @@ if [ -n "${GALAXY_ADMINS}" ]; then
     galaxy_config admin_users "${GALAXY_ADMINS}"
 fi
 
-# If the database or tool-data directories are empty (e.g., if a new
-# volume was passed to `docker run`, initialize them from skeletons.
+# If a volume directory is empty (e.g., if a new volume was
+# passed to `docker run`), initialize it from a skeleton.
 
 if [ -z "$(ls -A /galaxy/stable/database)" ]; then
     tar xvpf database_skel.tar.gz

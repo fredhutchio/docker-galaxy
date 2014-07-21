@@ -27,15 +27,16 @@ RUN apt-get update -q && \
     python-setuptools \
     subversion
 
-# # Create an unprivileged user for Galaxy to run as (and its home
-# # directory). From man 8, useradd, "System users will be created
-# # with no aging information in /etc/shadow, and their numeric
-# # identifiers are chosen in the SYS_UID_MIN-SYS_UID_MAX range,
-# # defined in /etc/login.defs, instead of UID_MIN-UID_MAX (and their
-# # GID counterparts for the creation of groups)."
-RUN useradd --system -m -d /galaxy -p galaxy galaxy
-
+# Install additional tools needed for installation.
 RUN apt-get install -y -q --no-install-recommends wget
+
+# Create an unprivileged user for Galaxy to run as (and its home
+# directory). From man 8 useradd, "System users will be created with
+# no aging information in /etc/shadow, and their numeric identifiers
+# are chosen in the SYS_UID_MIN-SYS_UID_MAX range, defined in
+# /etc/login.defs, instead of UID_MIN-UID_MAX (and their GID
+# counterparts for the creation of groups)."
+RUN useradd --system -m -d /galaxy -p galaxy galaxy
 
 # Do as much as work possible as the unprivileged galaxy user.
 WORKDIR /galaxy
@@ -90,7 +91,7 @@ RUN sed -i 's|^#\?\(nginx_x_accel_redirect_base\) = .*$|\1 = /_x_accel_redirect|
 # (i.e. if startup.sh changes).
 #RUN sed -i '1idaemon off;' /etc/nginx/nginx.conf
 
-# Add in some additional basic dependencies.
+# Add in additional dependencies as we come across them.
 RUN apt-get install -y -q --no-install-recommends \
     libxml2-dev \
     libz-dev
