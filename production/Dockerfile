@@ -1,5 +1,5 @@
 FROM bcclaywell/galaxy-base:testing
-ENV REFRESHED_AT 2014-07-15
+ENV REFRESHED_AT 2014-07-20
 
 MAINTAINER Brian Claywell <bclaywel@fhcrc.org>
 
