@@ -12,5 +12,4 @@ production/.timestamp: production/Dockerfile production/startup.sh base/.timesta
 
 docker-clean:
 	docker ps -a | grep Exited | cut -d' ' -f1 | xargs docker rm
-	docker images | grep none | awk '{print $3}' | xargs docker rmi
-
+	docker images | grep none | awk '{print $$3}' | xargs docker rmi
