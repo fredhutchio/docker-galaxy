@@ -113,13 +113,12 @@ RUN apt-get install -y -q --no-install-recommends \
 # Set debconf back to normal.
 RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
 
-ADD startup.sh /startup
+ADD docker-cmd.sh /docker-cmd
+ADD startup.sh /galaxy/stable/startup.sh
 
-VOLUME /galaxy/tools
-VOLUME /galaxy/stable/database
-VOLUME /galaxy/stable/static
-VOLUME /galaxy/stable/tool-data
+ENV GALAXY_EXPORT /galaxy/tools /galaxy/stable/database /galaxy/stable/static /galaxy/stable/tool-data
+VOLUME /export
 
 EXPOSE 80
 
-CMD ["/startup"]
+CMD ["/docker-cmd"]

@@ -4,21 +4,8 @@ set -eux
 make
 
 VOLUME_OPTS=""
-
-if [[ -e mnt/database ]]; then
-    VOLUME_OPTS="${VOLUME_OPTS} -v ${PWD}/mnt/database:/galaxy/stable/database"
-fi
-
-if [[ -e mnt/tool-data ]]; then
-    VOLUME_OPTS="${VOLUME_OPTS} -v ${PWD}/mnt/tool-data:/galaxy/stable/tool-data"
-fi
-
-if [[ -e mnt/tools ]]; then
-    VOLUME_OPTS="${VOLUME_OPTS} -v ${PWD}/mnt/tools:/galaxy/tools"
-fi
-
-if [[ -e mnt/static ]]; then
-    VOLUME_OPTS="${VOLUME_OPTS} -v ${PWD}/mnt/static:/galaxy/stable/static"
+if [ -d mnt ]; then
+    VOLUME_OPTS="-v $(readlink -f mnt):/export"
 fi
 
 exec docker run -it --rm \
