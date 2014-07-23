@@ -2,11 +2,11 @@
 
 all: base/.timestamp production/.timestamp
 
-base/.timestamp: base/Dockerfile
+base/.timestamp: base/Dockerfile base/docker-cmd.sh base/startup.sh
 	docker build -t bcclaywell/galaxy-base:testing base
 	touch base/.timestamp
 
-production/.timestamp: production/Dockerfile base/.timestamp
+production/.timestamp: production/Dockerfile production/startup.sh base/.timestamp
 	docker build -t bcclaywell/galaxy:testing production
 	touch production/.timestamp
 
