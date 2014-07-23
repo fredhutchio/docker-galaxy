@@ -25,7 +25,8 @@ RUN apt-get update -q && \
     pkg-config \
     python-dev \
     python-setuptools \
-    subversion
+    subversion && \
+    apt-get clean -q
 
 # Install additional tools needed for installation.
 RUN apt-get install -y -q --no-install-recommends wget
@@ -57,7 +58,7 @@ RUN mkdir database static tool-data
 
 # Fetch the latest source tarball from galaxy-central's stable branch.
 RUN wget -qO- https://bitbucket.org/galaxy/galaxy-central/get/stable.tar.gz | \
-    tar xvpz --strip-components=1
+    tar xvpz --strip-components=1 --exclude test-data
 
 # No-nonsense configuration!
 RUN cp universe_wsgi.ini.sample universe_wsgi.ini
@@ -69,8 +70,6 @@ RUN python scripts/fetch_eggs.py
 # We'll fix ownership of these below, after switching back to root.
 ADD shed_tool_conf.xml /galaxy/tools/shed_tool_conf.xml
 ADD shed_tool_data_table_conf.xml /galaxy/tools/shed_tool_data_table_conf.xml
-RUN mkdir tools/shed_tools tools/tool_deps && \
-    touch tools/shed_tools/.keep tools/tool_deps/.keep
 RUN sed -i 's|^#\?\(tool_config_file\) = .*$|\1 = tool_conf.xml,../tools/shed_tool_conf.xml|' universe_wsgi.ini && \
     sed -i 's|^#\?\(tool_dependency_dir\) = .*$|\1 = ../tools/tool_deps|' universe_wsgi.ini && \
     sed -i 's|^#\?\(check_migrate_tools\) = .*$|\1 = False|' universe_wsgi.ini
@@ -83,12 +82,6 @@ USER root
 
 # Fix ownership of/in /galaxy/tools.
 RUN chown -R galaxy:galaxy /galaxy/tools
-
-# Tar up directory skeletons for bootstrapping empty volumes.
-RUN tar cvzpf tools_skel.tar.gz ../tools && \
-    tar cvzpf database_skel.tar.gz database && \
-    tar cvzpf static_skel.tar.gz static && \
-    tar cvzpf tool-data_skel.tar.gz tool-data
 
 # Install and configure nginx to proxy requests.
 RUN apt-get install -y -q --no-install-recommends nginx-light
