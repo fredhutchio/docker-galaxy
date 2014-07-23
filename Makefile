@@ -1,4 +1,4 @@
-.PHONY: docker-clean
+.PHONY: clean docker-clean
 
 all: base/.timestamp production/.timestamp
 
@@ -9,6 +9,9 @@ base/.timestamp: base/Dockerfile base/docker-cmd.sh base/startup.sh
 production/.timestamp: production/Dockerfile production/startup.sh base/.timestamp
 	docker build -t bcclaywell/galaxy:testing production
 	touch production/.timestamp
+
+clean:
+	rm -f base/.timestamp production/.timestamp
 
 docker-clean:
 	docker ps -a | grep Exited | cut -d' ' -f1 | xargs docker rm
