@@ -91,8 +91,7 @@ cat <<EOF >> job_conf.xml
 </job_conf>
 EOF
 
-# TODO use start-stop-daemon?
-GALAXY_SERVERS="web0 web1 worker0 worker1"
+GALAXY_SERVERS="web0 worker0 worker1"
 for SERVER in ${GALAXY_SERVERS}; do
     echo -n "Starting ${SERVER}... "
     su -c "python ./scripts/paster.py serve universe_wsgi.ini --server-name=${SERVER} --pid-file=${SERVER}.pid --log-file=${SERVER}.log --daemon" galaxy
@@ -101,12 +100,12 @@ done
 
 # Reconfigure nginx for the new web processes.
 # TODO dynamic
-if grep -q 'server 127\.0\.0\.1:8081' /etc/nginx/nginx.conf; then
-    echo "servers already defined in nginx.conf, skipping"
-else
-    sed -i 's|\(server 127\.0\.0\.1:8080\);|\1; server 127.0.0.1:8081;|' /etc/nginx/nginx.conf
-    service nginx reload
-fi
+# if grep -q 'server 127\.0\.0\.1:8081' /etc/nginx/nginx.conf; then
+#     echo "servers already defined in nginx.conf, skipping"
+# else
+#     sed -i 's|\(server 127\.0\.0\.1:8080\);|\1; server 127.0.0.1:8081;|' /etc/nginx/nginx.conf
+#     service nginx reload
+# fi
 
 # Trap SIGINT so we can try to shut down cleanly.
 trap '{ echo -n "Shutting down... "; pkill -INT -f paster.py; sleep 10; echo " ok"; exit 0; }' SIGINT EXIT
