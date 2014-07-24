@@ -42,10 +42,7 @@ RUN useradd --system -m -d /galaxy -p galaxy galaxy
 # Do as much as work possible as the unprivileged galaxy user.
 WORKDIR /galaxy
 USER galaxy
-
-# Explicitly set this so it won't look in /.python-eggs.
-RUN mkdir .python-eggs
-ENV PYTHON_EGG_CACHE /galaxy/.python-eggs
+ENV HOME /galaxy
 
 # Set up /galaxy.
 RUN mkdir tools
