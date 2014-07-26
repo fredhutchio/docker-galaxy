@@ -75,8 +75,10 @@ fi
 # If there's a job_conf.xml in /root/private, use it instead of the
 # heredoc'd default.
 if [ -r /root/private/job_conf.xml ]; then
+    echo -n "Installing job_conf.xml from /root/private... "
     cp /root/private/job_conf.xml /galaxy/stable/job_conf.xml
     chown galaxy:galaxy job_conf.xml
+    echo "done."
 else
     cat <<EOF > job_conf.xml
 <?xml version="1.0"?>
