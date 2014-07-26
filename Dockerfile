@@ -103,12 +103,21 @@ RUN apt-get install -y -q --no-install-recommends \
 # Set debconf back to normal.
 RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
 
-ADD docker-cmd.sh /docker-cmd
-ADD startup.sh /galaxy/stable/startup.sh
+# Add run scripts.
+ADD docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 
+ADD startup-single.sh /galaxy/stable/startup-single.sh
+ADD startup-multi.sh /galaxy/stable/startup-multi.sh
+
+# Configure exports.
 ENV GALAXY_EXPORT /galaxy/tools /galaxy/stable/database /galaxy/stable/static /galaxy/stable/tool-data
 VOLUME /export
 
 EXPOSE 80
 
-CMD ["/docker-cmd"]
+# Set the entrypoint, which performs some common configuration steps
+# before yielding to CMD.
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
+
+# Start the single-process server by default.
+CMD ["/galaxy/stable/startup-single.sh"]

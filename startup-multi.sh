@@ -14,8 +14,9 @@ set -e
 # The excess of scripting is because I'd rather avoid including the
 # config files themselves in this repo, instead preferring to modify
 # the default config one line at a time in either the Dockerfile
-# (baking the change into the image) or the docker entrypoint script
-# (making the change as needed just before starting the server).
+# (baking the change into the image) or the docker entrypoint or
+# startup scripts (making the change as needed just before starting
+# the server).
 
 # usage: galaxy_config database_connection "$DB_CONN"
 galaxy_config() {
@@ -38,7 +39,10 @@ wait_for_ok() {
 
 #####
 
-# Start a Galaxy process and wait for a 200 OK.
+# Start a Galaxy process and wait for a 200 OK. This will
+# automatically download missing eggs, install defaults for missing
+# files, and prepare the database, and is generally a good sanity
+# check before proceeding.
 su -c "sh run.sh --daemon" galaxy
 wait_for_ok http://127.0.0.1:80
 
