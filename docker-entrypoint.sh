@@ -73,16 +73,12 @@ for dir in ${GALAXY_EXPORT}; do
 done
 set +u
 
-# Configure ssh public key authentication if there's a private key in
-# /root/private.
-if [ -r /root/private/id_rsa ]; then
-    echo -n "Installing private key... "
-    mkdir /galaxy/.ssh
+# Move /root/private/ssh into place if it exists.
+if [ -d /root/private/ssh ]; then
+    echo -n "Configuring ssh... "
+    mv /root/private/ssh /galaxy/.ssh
     chmod 700 /galaxy/.ssh
-
-    cp /root/private/id_rsa /galaxy/.ssh/id_rsa
     chmod 600 /galaxy/.ssh/id_rsa
-
     chown -R galaxy:galaxy /galaxy/.ssh
     echo "done."
 fi
