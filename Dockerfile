@@ -98,7 +98,8 @@ RUN sed -i 's|^#\?\(nginx_x_accel_redirect_base\) = .*$|\1 = /_x_accel_redirect|
 # Add in additional dependencies as we come across them.
 RUN apt-get install -y -q --no-install-recommends \
     libxml2-dev \
-    libz-dev
+    libz-dev \
+    openssh-client
 
 # Set debconf back to normal.
 RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
@@ -109,8 +110,9 @@ ADD docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 ADD startup-single.sh /galaxy/stable/startup-single.sh
 ADD startup-multi.sh /galaxy/stable/startup-multi.sh
 
-# Add private data (e.g. ssh keys).
-ADD private /root/private
+# Add private data for the runtime scripts to configure/use.
+# This should only be uncommented for custom builds.
+#ADD private /root/private
 
 # Configure exports.
 ENV GALAXY_EXPORT /galaxy/tools /galaxy/stable/database /galaxy/stable/static /galaxy/stable/tool-data
