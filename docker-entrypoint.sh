@@ -27,9 +27,6 @@ wait_for_ok() {
 
 #####
 
-# Start the web proxy.
-service nginx start
-
 cd /galaxy/stable
 
 # Set up a connection string for a database on a linked container.
@@ -82,6 +79,9 @@ if [ -d /root/private/ssh ]; then
     chown -R galaxy:galaxy /galaxy/.ssh
     echo "done."
 fi
+
+# Start the web proxy.
+service nginx start
 
 # Replace this shell with the supplied command (and any arguments).
 exec $@
