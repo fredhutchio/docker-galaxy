@@ -104,9 +104,10 @@ RUN apt-get install -y -q --no-install-recommends \
 # Set debconf back to normal.
 RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
 
-# Add run scripts.
+# Add entrypoint script.
 ADD docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 
+# Add startup scripts.
 ADD startup-single.sh /galaxy/stable/startup-single.sh
 ADD startup-multi.sh /galaxy/stable/startup-multi.sh
 
