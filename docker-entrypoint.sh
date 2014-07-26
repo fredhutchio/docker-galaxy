@@ -17,8 +17,7 @@ wait_for_ok() {
     echo -n "waiting for 200 OK..."
     until wget -qO /dev/null $1; do
         if [[ $? > 0 && $? < 8 ]]; then
-            echo " error"
-            break
+            return $?
         fi
         echo -n "."
         sleep 5
