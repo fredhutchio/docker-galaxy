@@ -109,6 +109,9 @@ ADD docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 ADD startup-single.sh /galaxy/stable/startup-single.sh
 ADD startup-multi.sh /galaxy/stable/startup-multi.sh
 
+# Add private data (e.g. ssh keys).
+ADD private /root/private
+
 # Configure exports.
 ENV GALAXY_EXPORT /galaxy/tools /galaxy/stable/database /galaxy/stable/static /galaxy/stable/tool-data
 VOLUME /export
