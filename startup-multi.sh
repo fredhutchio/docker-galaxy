@@ -72,7 +72,13 @@ else
     define_galaxy_server worker1 8091 5 >> universe_wsgi.ini
 fi
 
-cat <<EOF > job_conf.xml
+# If there's a job_conf.xml in /root/private, use it instead of the
+# heredoc'd default.
+if [ -r /root/private/job_conf.xml ]; then
+    cp /root/private/job_conf.xml /galaxy/stable/job_conf.xml
+    chown galaxy:galaxy job_conf.xml
+else
+    cat <<EOF > job_conf.xml
 <?xml version="1.0"?>
 <job_conf>
     <plugins workers="4">
@@ -82,18 +88,19 @@ cat <<EOF > job_conf.xml
 EOF
 
 # TODO dynamic
-cat <<EOF >> job_conf.xml
+    cat <<EOF >> job_conf.xml
         <handler id="worker0" tags="workers"/>
         <handler id="worker1" tags="workers"/>
 EOF
 
-cat <<EOF >> job_conf.xml
+    cat <<EOF >> job_conf.xml
     </handlers>
     <destinations>
         <destination id="local" runner="local"/>
     </destinations>
 </job_conf>
 EOF
+fi
 
 GALAXY_SERVERS="web0 worker0 worker1"
 for SERVER in ${GALAXY_SERVERS}; do
