@@ -108,8 +108,8 @@ RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
 ADD docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 
 # Add startup scripts.
-ADD startup-single.sh /galaxy/stable/startup-single.sh
-ADD startup-multi.sh /galaxy/stable/startup-multi.sh
+ADD startup-basic.sh /galaxy/stable/startup-basic.sh
+ADD startup-custom.sh /galaxy/stable/startup-custom.sh
 
 # Add private data for the runtime scripts to configure/use.
 # This should only be uncommented for custom builds.
@@ -125,5 +125,5 @@ EXPOSE 80
 # before yielding to CMD.
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 
-# Start the single-process server by default.
-CMD ["/galaxy/stable/startup-single.sh"]
+# Start the basic server by default.
+CMD ["/galaxy/stable/startup-basic.sh"]
