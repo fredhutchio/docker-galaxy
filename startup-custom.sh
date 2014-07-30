@@ -37,18 +37,6 @@ wait_for_ok() {
     echo " ok"
 }
 
-#####
-
-# Start a Galaxy process and wait for a 200 OK. This will
-# automatically download missing eggs, install defaults for missing
-# files, and prepare the database, and is generally a good sanity
-# check before proceeding.
-su -c "sh run.sh --daemon" galaxy
-wait_for_ok http://127.0.0.1:80
-
-# Stop Galaxy again so we can finish setting up.
-su -c "sh run.sh --stop-daemon" galaxy
-
 # usage: galaxy_server <ID> <PORT> <WORKERS>
 define_galaxy_server() {
     cat <<EOF
@@ -62,12 +50,27 @@ threadpool_workers = $3
 EOF
 }
 
-# TODO dynamic
-if grep -q web0 universe_wsgi.ini; then
-    echo "servers already defined in universe_wsgi.ini, skipping"
+#####
+
+# Start a Galaxy process and wait for a 200 OK. This will
+# automatically download missing eggs, install defaults for missing
+# files, and prepare the database, and is generally a good sanity
+# check before proceeding.
+su -c "sh run.sh --daemon" galaxy
+wait_for_ok http://127.0.0.1:80
+
+# Stop Galaxy again so we can finish setting up.
+su -c "sh run.sh --stop-daemon" galaxy
+
+# If there's a universe_wsgi.ini in /root/private, use it instead of
+# adding to the default.
+if [ -r /root/private/universe_wsgi.ini ]; then
+    echo -n "Installing universe_wsgi.ini from /root/private... "
+    cp /root/private/universe_wsgi.ini /galaxy/stable/universe_wsgi.ini
+    chown galaxy:galaxy universe_wsgi.ini
+    echo "done."
 else
-    define_galaxy_server web0 8080 7 >> universe_wsgi.ini
-    define_galaxy_server web1 8081 7 >> universe_wsgi.ini
+    # Already in universe_wsgi.ini is the 'main' server on 8080.
     define_galaxy_server worker0 8090 5 >> universe_wsgi.ini
     define_galaxy_server worker1 8091 5 >> universe_wsgi.ini
 fi
@@ -87,15 +90,8 @@ else
         <plugin id="local" type="runner" load="galaxy.jobs.runners.local:LocalJobRunner"/>
     </plugins>
     <handlers default="workers">
-EOF
-
-# TODO dynamic
-    cat <<EOF >> job_conf.xml
         <handler id="worker0" tags="workers"/>
         <handler id="worker1" tags="workers"/>
-EOF
-
-    cat <<EOF >> job_conf.xml
     </handlers>
     <destinations>
         <destination id="local" runner="local"/>
@@ -104,25 +100,21 @@ EOF
 EOF
 fi
 
-GALAXY_SERVERS="web0 worker0 worker1"
-for SERVER in ${GALAXY_SERVERS}; do
-    echo -n "Starting ${SERVER}... "
-    su -c "python ./scripts/paster.py serve universe_wsgi.ini --server-name=${SERVER} --pid-file=${SERVER}.pid --log-file=${SERVER}.log --daemon" galaxy
-    echo "ok"
-done
+# If there's a tool_conf.xml in /root/private, use it instead of the
+# distribution default.
+if [ -r /root/private/tool_conf.xml ]; then 
+    echo -n "Installing tool_conf.xml from /root/private... "
+    cp /root/private/tool_conf.xml /galaxy/stable/tool_conf.xml
+    chown galaxy:galaxy tool_conf.xml
+    echo "done."
+fi
 
-# Reconfigure nginx for the new web processes.
-# TODO dynamic
-# if grep -q 'server 127\.0\.0\.1:8081' /etc/nginx/nginx.conf; then
-#     echo "servers already defined in nginx.conf, skipping"
-# else
-#     sed -i 's|\(server 127\.0\.0\.1:8080\);|\1; server 127.0.0.1:8081;|' /etc/nginx/nginx.conf
-#     service nginx reload
-# fi
+# Use Galaxy's rolling restart script to start the servers.
+su -c "bash rolling_restart.sh" galaxy
 
 # Trap SIGINT so we can try to shut down cleanly.
 trap '{ echo -n "Shutting down... "; pkill -INT -f paster.py; sleep 10; echo " ok"; exit 0; }' SIGINT EXIT
-tail -f web*.log worker*.log
+tail -f main.log worker*.log
 
 # Turn over this process to a shell for testing.
 #exec /bin/bash
