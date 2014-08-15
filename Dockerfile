@@ -1,5 +1,5 @@
 FROM debian:jessie
-ENV REFRESHED_AT 2014-07-20
+ENV REFRESHED_AT 2014-08-15
 
 MAINTAINER Brian Claywell <bclaywel@fhcrc.org>
 
