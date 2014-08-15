@@ -67,7 +67,7 @@ RUN python scripts/fetch_eggs.py
 # We'll fix ownership of these below, after switching back to root.
 ADD shed_tool_conf.xml /galaxy/tools/shed_tool_conf.xml
 ADD shed_tool_data_table_conf.xml /galaxy/tools/shed_tool_data_table_conf.xml
-RUN sed -i 's|^#\?\(tool_config_file\) = .*$|\1 = tool_conf.xml,../tools/shed_tool_conf.xml|' universe_wsgi.ini && \
+RUN sed -i 's|^#\?\(tool_config_file\) = .*$|\1 = tool_conf.xml,/galaxy/tools/shed_tool_conf.xml|' universe_wsgi.ini && \
     sed -i 's|^#\?\(tool_dependency_dir\) = .*$|\1 = ../tools/tool_deps|' universe_wsgi.ini && \
     sed -i 's|^#\?\(check_migrate_tools\) = .*$|\1 = False|' universe_wsgi.ini
 
