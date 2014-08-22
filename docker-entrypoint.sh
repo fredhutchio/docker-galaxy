@@ -70,6 +70,12 @@ for dir in ${GALAXY_EXPORT}; do
 done
 set +u
 
+# Initialize relocated datatypes_conf.xml if it doesn't exist.
+if [ ! -e /galaxy/tools/datatypes_conf.xml ]; then
+    cp datatypes_conf.xml.sample /galaxy/tools/datatypes_conf.xml
+    chown galaxy:galaxy /galaxy/tools/datatypes_conf.xml
+fi
+
 # Move /root/private/ssh into place if it exists.
 if [ -d /root/private/ssh ]; then
     echo -n "Configuring ssh... "
