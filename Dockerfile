@@ -119,7 +119,7 @@ ADD startup-custom.sh /galaxy/stable/startup-custom.sh
 #ADD private /root/private
 
 # Configure exports.
-ENV GALAXY_EXPORT /galaxy/tools /galaxy/stable/database /galaxy/stable/display_applications /galaxy/stable/static /galaxy/stable/tool-data
+ENV DOCKER_EXPORT /galaxy/tools /galaxy/stable/database /galaxy/stable/display_applications /galaxy/stable/static /galaxy/stable/tool-data
 VOLUME /export
 
 EXPOSE 80

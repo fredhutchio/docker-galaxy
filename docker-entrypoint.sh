@@ -49,9 +49,9 @@ fi
 
 # Configure exports. If an exported directory doesn't yet exist on
 # /export, move the container's data over before symlinking the export
-# into place. GALAXY_EXPORT is set in the Dockerfile or at runtime.
+# into place. DOCKER_EXPORT is set in the Dockerfile or at runtime.
 set -u
-for dir in ${GALAXY_EXPORT}; do
+for dir in ${DOCKER_EXPORT}; do
     # If the directory doesn't exist in /export, copy it over.
     if [ ! -d /export${dir} ]; then
         echo -n "Migrating ${dir} to /export$dir... "
