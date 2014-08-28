@@ -1,2 +1,4 @@
 /private/*
 !/private/README.md
+.stamp
+/private/
