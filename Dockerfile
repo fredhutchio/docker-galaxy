@@ -109,6 +109,7 @@ RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
 
 # Add entrypoint script.
 ADD docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+ADD docker-link-exports.sh /usr/local/bin/docker-link-exports
 
 # Add startup scripts.
 ADD startup-basic.sh /galaxy/stable/startup-basic.sh
@@ -119,6 +120,7 @@ ADD startup-custom.sh /galaxy/stable/startup-custom.sh
 #ADD private /root/private
 
 # Configure exports.
+ENV DATA_EXPORT_DIR /export
 ENV DATA_EXPORTS /galaxy/tools /galaxy/stable/database /galaxy/stable/display_applications /galaxy/stable/static /galaxy/stable/tool-data
 VOLUME /export
 
