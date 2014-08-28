@@ -49,13 +49,12 @@ fi
 
 # Configure exports. If an exported directory doesn't yet exist on
 # /export, move the container's data over before symlinking the export
-# into place. DOCKER_EXPORT is set in the Dockerfile or at runtime.
-set -u
-for dir in ${DOCKER_EXPORT}; do
+# into place. DATA_EXPORTS is set in the Dockerfile or at runtime.
+if [ -d /export ]; then set -u
+for dir in ${DATA_EXPORTS}; do
     # If the directory doesn't exist in /export, copy it over.
     if [ ! -d /export${dir} ]; then
         echo -n "Migrating ${dir} to /export$dir... "
-        EXPORT_BASE="/export$(dirname ${dir})"
         # Since most of this will be many small text files, compress
         # and stream the data (instead of mv) in case /export is
         # actually mounted over a network.
@@ -68,7 +67,7 @@ for dir in ${DOCKER_EXPORT}; do
     ln -s /export${dir} ${dir}
     echo "done."
 done
-set +u
+set +u; fi
 
 # Initialize relocated datatypes_conf.xml if it doesn't exist.
 if [ ! -e /galaxy/tools/datatypes_conf.xml ]; then
