@@ -119,11 +119,6 @@ ADD startup-custom.sh /galaxy/stable/startup-custom.sh
 # This should only be uncommented for custom builds.
 #ADD private /root/private
 
-# Configure exports.
-ENV DATA_EXPORT_DIR /export
-ENV DATA_EXPORTS /galaxy/tools /galaxy/stable/database /galaxy/stable/display_applications /galaxy/stable/static /galaxy/stable/tool-data
-VOLUME /export
-
 EXPOSE 80
 
 # Set the entrypoint, which performs some common configuration steps
