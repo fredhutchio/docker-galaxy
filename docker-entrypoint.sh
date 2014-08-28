@@ -48,7 +48,7 @@ if [ -n "${GALAXY_ADMINS}" ]; then
 fi
 
 # Configure exports.
-if [ -n "$DATA_EXPORTS" -a -n "${DATA_EXPORT_DIR}" ]; then
+if [ -n "${DATA_EXPORTS}" -a -n "${DATA_EXPORT_DIR}" ]; then
     docker-link-exports
 fi
 
