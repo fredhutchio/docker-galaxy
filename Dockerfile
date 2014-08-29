@@ -74,9 +74,6 @@ RUN sed -i 's|^#\?\(tool_config_file\) = .*$|\1 = tool_conf.xml,../tools/shed_to
 # Ape the basic job_conf.xml.
 RUN cp job_conf.xml.sample_basic job_conf.xml
 
-# Relocate datatypes_conf.xml to the exported tools directory.
-RUN sed -i 's|^#\?\(datatypes_config_file\) = .*$|\1 = ../tools/datatypes_conf.xml|' universe_wsgi.ini
-
 # Switch back to root for the rest of the configuration.
 USER root
 
