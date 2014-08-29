@@ -18,17 +18,25 @@ if [ -d ${DATA_EXPORT_DIR} ]; then
                 # compress and stream the data (instead of mv) in case
                 # DATA_EXPORT_DIR is actually mounted over a network.
                 tar cpz -C / ${source} 2> /dev/null | tar xpzf - -C ${DATA_EXPORT_DIR}
-            else
+            elif [ -f ${source} ]; then
                 [ -d ${target_dir} ] || mkdir -p ${target_dir}
                 cp ${source} ${target}
+            elif [ -f ${source}.sample ]; then
+                [ -d ${target_dir} ] || mkdir -p ${target_dir}
+                cp ${source}.sample ${target}
             fi
             echo "done."
         fi
-        # Unlink the source and symlink the target in.
+
         echo -n "Symlinking ${target} into place... "
-        source_tmp=$(mktemp -u ${source}.XXXX)
-        mv -f ${source} ${source_tmp}
-        ln -s ${target} ${source} && rm -rf ${source_tmp}
+        if [ -e ${source} ]; then
+            # Unlink the source and symlink the target in.
+            source_tmp=$(mktemp -u $(dirname ${source})/$(basename ${source}).XXXX)
+            mv -f ${source} ${source_tmp}
+            ln -s ${target} ${source} && rm -rf ${source_tmp}
+        else
+            ln -s ${target} ${source}
+        fi
         echo "done."
     done
 fi
