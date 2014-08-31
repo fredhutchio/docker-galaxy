@@ -20,10 +20,10 @@ if [ -d ${DATA_EXPORT_DIR} ]; then
                 tar cpz -C / ${source} 2> /dev/null | tar xpzf - -C ${DATA_EXPORT_DIR}
             elif [ -f ${source} ]; then
                 [ -d ${target_dir} ] || mkdir -p ${target_dir}
-                cp ${source} ${target}
+                cp -a ${source} ${target}
             elif [ -f ${source}.sample ]; then
                 [ -d ${target_dir} ] || mkdir -p ${target_dir}
-                cp ${source}.sample ${target}
+                cp -a ${source}.sample ${target}
             fi
             echo "done."
         fi
