@@ -45,7 +45,7 @@ USER galaxy
 ENV HOME /galaxy
 
 # Set up /galaxy.
-RUN mkdir tools
+RUN mkdir shed_tools tool_deps
 
 RUN mkdir stable
 WORKDIR /galaxy/stable
@@ -64,21 +64,16 @@ RUN cp -a universe_wsgi.ini.sample universe_wsgi.ini
 RUN python scripts/fetch_eggs.py
 
 # Configure toolsheds. See https://wiki.galaxyproject.org/InstallingRepositoriesToGalaxy
-# We'll fix ownership of these below, after switching back to root.
-ADD shed_tool_conf.xml /galaxy/tools/shed_tool_conf.xml
-ADD shed_tool_data_table_conf.xml /galaxy/tools/shed_tool_data_table_conf.xml
-RUN sed -i 's|^#\?\(tool_config_file\) = .*$|\1 = tool_conf.xml,../tools/shed_tool_conf.xml|' universe_wsgi.ini && \
-    sed -i 's|^#\?\(tool_dependency_dir\) = .*$|\1 = ../tools/tool_deps|' universe_wsgi.ini && \
-    sed -i 's|^#\?\(check_migrate_tools\) = .*$|\1 = False|' universe_wsgi.ini
+RUN cp -a shed_tool_conf.xml.sample shed_tool_conf.xml
+RUN sed -i 's|^#\?\(tool_config_file\) = .*$|\1 = tool_conf.xml,shed_tool_conf.xml|' universe_wsgi.ini && \
+    sed -i 's|^#\?\(tool_dependency_dir\) = .*$|\1 = ../tool_deps|' universe_wsgi.ini && \
+    sed -i 's|^#\?\(check_migrate_tools\) = .*$|\1 = False|' universe_wsgi.ini && \
 
 # Ape the basic job_conf.xml.
 RUN cp -a job_conf.xml.sample_basic job_conf.xml
 
 # Switch back to root for the rest of the configuration.
 USER root
-
-# Fix ownership of/in /galaxy/tools.
-RUN chown -R galaxy:galaxy /galaxy/tools
 
 # Install and configure nginx to proxy requests.
 RUN apt-get install -y -q --no-install-recommends nginx-light
