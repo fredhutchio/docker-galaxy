@@ -21,9 +21,6 @@ if [ -d ${DATA_EXPORT_DIR} ]; then
             elif [ -f ${source} ]; then
                 [ -d ${target_dir} ] || mkdir -p ${target_dir}
                 cp -a ${source} ${target}
-            elif [ -f ${source}.sample ]; then
-                [ -d ${target_dir} ] || mkdir -p ${target_dir}
-                cp -a ${source}.sample ${target}
             fi
             echo "done."
         fi

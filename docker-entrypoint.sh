@@ -49,13 +49,14 @@ fi
 
 # Configure exports.
 if [ -n "${DATA_EXPORTS}" -a -n "${DATA_EXPORT_DIR}" ]; then
+    # Initialize exports from .sample files if they don't exist yet.
+    for src in ${DATA_EXPORTS}; do
+        if [ ! -e ${src} -a -e ${src}.sample ]; then
+            cp -a ${src}.sample ${src}
+        fi
+    done
     docker-link-exports
-fi
-
-# Initialize relocated datatypes_conf.xml if it doesn't exist.
-if [ ! -e /galaxy/tools/datatypes_conf.xml ]; then
-    cp datatypes_conf.xml.sample /galaxy/tools/datatypes_conf.xml
-    chown galaxy:galaxy /galaxy/tools/datatypes_conf.xml
+    chown -R galaxy:galaxy ${DATA_EXPORT_DIR}
 fi
 
 # Move /root/private/ssh into place if it exists.
