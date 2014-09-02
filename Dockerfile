@@ -67,7 +67,7 @@ RUN python scripts/fetch_eggs.py
 RUN cp -a shed_tool_conf.xml.sample shed_tool_conf.xml
 RUN sed -i 's|^#\?\(tool_config_file\) = .*$|\1 = tool_conf.xml,shed_tool_conf.xml|' universe_wsgi.ini && \
     sed -i 's|^#\?\(tool_dependency_dir\) = .*$|\1 = ../tool_deps|' universe_wsgi.ini && \
-    sed -i 's|^#\?\(check_migrate_tools\) = .*$|\1 = False|' universe_wsgi.ini && \
+    sed -i 's|^#\?\(check_migrate_tools\) = .*$|\1 = False|' universe_wsgi.ini
 
 # Ape the basic job_conf.xml.
 RUN cp -a job_conf.xml.sample_basic job_conf.xml
