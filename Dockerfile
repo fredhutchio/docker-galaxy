@@ -58,7 +58,7 @@ RUN wget -qO- https://bitbucket.org/galaxy/galaxy-central/get/stable.tar.gz | \
     tar xvpz --strip-components=1 --exclude test-data
 
 # No-nonsense configuration!
-RUN cp universe_wsgi.ini.sample universe_wsgi.ini
+RUN cp -a universe_wsgi.ini.sample universe_wsgi.ini
 
 # Fetch dependencies.
 RUN python scripts/fetch_eggs.py
@@ -72,7 +72,7 @@ RUN sed -i 's|^#\?\(tool_config_file\) = .*$|\1 = tool_conf.xml,../tools/shed_to
     sed -i 's|^#\?\(check_migrate_tools\) = .*$|\1 = False|' universe_wsgi.ini
 
 # Ape the basic job_conf.xml.
-RUN cp job_conf.xml.sample_basic job_conf.xml
+RUN cp -a job_conf.xml.sample_basic job_conf.xml
 
 # Switch back to root for the rest of the configuration.
 USER root
