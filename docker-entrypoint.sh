@@ -9,7 +9,7 @@ set -e
 
 # usage: galaxy_config database_connection "$DB_CONN"
 galaxy_config() {
-    sed -i 's|^#\?\('"$1"'\) = .*$|\1 = '"$2"'|' /galaxy/stable/universe_wsgi.ini
+    sed -i 's|^#\?\('"$1"'\) = .*$|\1 = '"$2"'|' ${GALAXY_HOME}/universe_wsgi.ini
 }
 
 # usage: wait_for_ok http://example.com
@@ -27,7 +27,25 @@ wait_for_ok() {
 
 #####
 
-cd /galaxy/stable
+GALAXY_ROOT="${GALAXY_ROOT:-/galaxy}"
+GALAXY_HOME="${GALAXY_ROOT}/stable"
+
+if [ ${GALAXY_ROOT} != "/galaxy" ]; then
+    echo -n "Rerooting Galaxy to ${GALAXY_ROOT}... "
+    mkdir -p ${GALAXY_ROOT} && chown galaxy:galaxy ${GALAXY_ROOT}
+    tar cpz -C /galaxy . 2> /dev/null | tar xpzf - -C ${GALAXY_ROOT}
+    echo "done."
+fi
+
+#
+# Ensure proper permissions are set on the persistence folders.
+#
+
+cd ${GALAXY_ROOT}
+chown galaxy:galaxy shed_tools stable tool_deps
+
+cd ${GALAXY_HOME}
+chown galaxy:galaxy database tool-data static
 
 # Set up a connection string for a database on a linked container.
 # Default: postgresql://galaxy:galaxy@HOST:PORT/galaxy
@@ -56,7 +74,7 @@ if [ -n "${DATA_EXPORTS}" -a -n "${DATA_EXPORT_DIR}" ]; then
         fi
     done
     docker-link-exports
-    chown -R galaxy:galaxy ${DATA_EXPORT_DIR}
+    chown -R galaxy:galaxy ${DATA_EXPORT_DIR}/${GALAXY_ROOT}
 fi
 
 # Move /root/private/ssh into place if it exists.
