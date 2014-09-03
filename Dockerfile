@@ -91,7 +91,8 @@ RUN sed -i 's|^#\?\(nginx_x_accel_redirect_base\) = .*$|\1 = /_x_accel_redirect|
 #RUN sed -i '1idaemon off;' /etc/nginx/nginx.conf
 
 # Add in additional dependencies as we come across them.
-RUN apt-get install -y -q --no-install-recommends \
+RUN apt-get update -q && \
+    apt-get install -y -q --no-install-recommends \
     libxml2-dev \
     libz-dev \
     openssh-client
