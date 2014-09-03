@@ -51,6 +51,7 @@ chown galaxy:galaxy shed_tools stable tool_deps
 
 cd ${GALAXY_HOME}
 chown galaxy:galaxy database tool-data static
+chmod -R o=rX static
 
 # Set up a connection string for a database on a linked container.
 # Default: postgresql://galaxy:galaxy@HOST:PORT/galaxy
