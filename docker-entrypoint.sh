@@ -36,6 +36,10 @@ if [ ${GALAXY_ROOT} != "/galaxy" ]; then
     chown galaxy:galaxy ${GALAXY_ROOT}
     cp -ar --update -T /galaxy ${GALAXY_ROOT}
     echo "done."
+
+    echo -n "Updating nginx.conf... "
+    sed -i 's|/galaxy/stable|'"${GALAXY_HOME}"'|g' /etc/nginx/nginx.conf
+    echo "done."
 fi
 
 #
