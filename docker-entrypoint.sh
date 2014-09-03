@@ -32,8 +32,9 @@ GALAXY_HOME="${GALAXY_ROOT}/stable"
 
 if [ ${GALAXY_ROOT} != "/galaxy" ]; then
     echo -n "Rerooting Galaxy to ${GALAXY_ROOT}... "
-    mkdir -p ${GALAXY_ROOT} && chown galaxy:galaxy ${GALAXY_ROOT}
-    tar cpz -C /galaxy . 2> /dev/null | tar xpzf - -C ${GALAXY_ROOT}
+    mkdir -p ${GALAXY_ROOT}
+    chown galaxy:galaxy ${GALAXY_ROOT}
+    cp -ar --update -T /galaxy ${GALAXY_ROOT}
     echo "done."
 fi
 
