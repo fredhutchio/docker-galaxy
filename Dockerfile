@@ -25,7 +25,11 @@ RUN apt-get update -q && \
     pkg-config \
     python-dev \
     python-setuptools \
-    subversion && \
+    subversion \
+    nginx-light \
+    libxml2-dev \
+    libz-dev \
+    openssh-client && \
     apt-get clean -q
 
 # Install additional tools needed for installation.
@@ -72,11 +76,7 @@ RUN sed -i 's|^#\?\(tool_config_file\) = .*$|\1 = tool_conf.xml,shed_tool_conf.x
 # Ape the basic job_conf.xml.
 RUN cp -a job_conf.xml.sample_basic job_conf.xml
 
-# Switch back to root for the rest of the configuration.
-USER root
-
-# Install and configure nginx to proxy requests.
-RUN apt-get install -y -q --no-install-recommends nginx-light
+# Configure nginx to proxy requests.
 ADD nginx.conf /etc/nginx/nginx.conf
 
 # Static content will be handled by nginx, so disable it in Galaxy.
@@ -86,16 +86,12 @@ RUN sed -i 's|^#\?\(static_enabled\) = .*$|\1 = False|' universe_wsgi.ini
 RUN sed -i 's|^#\?\(nginx_x_accel_redirect_base\) = .*$|\1 = /_x_accel_redirect|' universe_wsgi.ini && \
     sed -i 's|^#\?\(nginx_x_archive_files_base\) = .*$|\1 = /_x_accel_redirect|' universe_wsgi.ini
 
+# Switch back to root for the rest of the configuration.
+USER root
+
 # Uncomment this line if nginx shouldn't fork into the background.
 # (i.e. if startup.sh changes).
 #RUN sed -i '1idaemon off;' /etc/nginx/nginx.conf
-
-# Add in additional dependencies as we come across them.
-RUN apt-get update -q && \
-    apt-get install -y -q --no-install-recommends \
-    libxml2-dev \
-    libz-dev \
-    openssh-client
 
 # Set debconf back to normal.
 RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
