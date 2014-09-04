@@ -1,5 +1,5 @@
 FROM ubuntu:12.04
-ENV REFRESHED_AT 2014-09-03
+ENV REFRESHED_AT 2014-09-04
 
 MAINTAINER Brian Claywell <bclaywel@fhcrc.org>
 
@@ -26,14 +26,12 @@ RUN apt-get update -q && \
     python-dev \
     python-setuptools \
     subversion \
+    wget \
     nginx-light \
     libxml2-dev \
     libz-dev \
     openssh-client && \
     apt-get clean -q
-
-# Install additional tools needed for installation.
-RUN apt-get install -y -q --no-install-recommends wget
 
 # Create an unprivileged user for Galaxy to run as (and its home
 # directory). From man 8 useradd, "System users will be created with
