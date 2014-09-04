@@ -1,5 +1,5 @@
-FROM debian:jessie
-ENV REFRESHED_AT 2014-08-28
+FROM ubuntu:12.04
+ENV REFRESHED_AT 2014-09-03
 
 MAINTAINER Brian Claywell <bclaywel@fhcrc.org>
 
