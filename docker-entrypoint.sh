@@ -34,7 +34,7 @@ if [ ${GALAXY_ROOT} != "/galaxy" ]; then
     cd /galaxy
     echo -n "Rerooting Galaxy to ${GALAXY_ROOT}... "
     mkdir -p ${GALAXY_ROOT}
-    tar cpz -C /galaxy . | tar xpzf - -C ${GALAXY_ROOT} --recursive-unlink
+    tar cpz -C /galaxy . | tar xpzf - -C ${GALAXY_ROOT}
     echo "done."
 
     echo -n "Updating nginx.conf... "
