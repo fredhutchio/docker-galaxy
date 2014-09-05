@@ -31,10 +31,10 @@ GALAXY_ROOT="${GALAXY_ROOT:-/galaxy}"
 GALAXY_HOME="${GALAXY_ROOT}/stable"
 
 if [ ${GALAXY_ROOT} != "/galaxy" ]; then
+    cd /galaxy
     echo -n "Rerooting Galaxy to ${GALAXY_ROOT}... "
     mkdir -p ${GALAXY_ROOT}
-    chown galaxy:galaxy ${GALAXY_ROOT}
-    cp -ar --update -T /galaxy ${GALAXY_ROOT}
+    tar cpz -C /galaxy . | tar xpzf - -C ${GALAXY_ROOT} --recursive-unlink
     echo "done."
 
     echo -n "Updating nginx.conf... "
@@ -42,15 +42,23 @@ if [ ${GALAXY_ROOT} != "/galaxy" ]; then
     echo "done."
 fi
 
-#
-# Ensure proper permissions are set on the persistence folders.
-#
-
 cd ${GALAXY_ROOT}
-chown galaxy:galaxy shed_tools stable tool_deps
+
+# Configure exports.
+if [ -n "${DATA_EXPORTS}" -a -n "${DATA_EXPORT_DIR}" ]; then
+    mkdir -p ${DATA_EXPORT_DIR}
+
+    # Initialize exports from .sample files if they don't exist yet.
+    for src in ${DATA_EXPORTS}; do
+        if [ ! -e ${src} -a -e ${src}.sample ]; then
+            cp -a ${src}.sample ${src}
+        fi
+    done
+    docker-link-exports
+fi
 
 cd ${GALAXY_HOME}
-chown galaxy:galaxy database tool-data static
+chown -R galaxy:galaxy ${GALAXY_ROOT}
 chmod -R o=rX static
 
 # Set up a connection string for a database on a linked container.
@@ -69,18 +77,6 @@ fi
 # Configure Galaxy admin users if $GALAXY_ADMINS is set.
 if [ -n "${GALAXY_ADMINS}" ]; then
     galaxy_config admin_users "${GALAXY_ADMINS}"
-fi
-
-# Configure exports.
-if [ -n "${DATA_EXPORTS}" -a -n "${DATA_EXPORT_DIR}" ]; then
-    # Initialize exports from .sample files if they don't exist yet.
-    for src in ${DATA_EXPORTS}; do
-        if [ ! -e ${src} -a -e ${src}.sample ]; then
-            cp -a ${src}.sample ${src}
-        fi
-    done
-    docker-link-exports
-    chown -R galaxy:galaxy ${DATA_EXPORT_DIR}/${GALAXY_ROOT}
 fi
 
 # Move /root/private/ssh into place if it exists.
