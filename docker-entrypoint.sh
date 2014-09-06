@@ -31,11 +31,14 @@ GALAXY_ROOT="${GALAXY_ROOT:-/galaxy}"
 GALAXY_HOME="${GALAXY_ROOT}/stable"
 
 if [ ${GALAXY_ROOT} != "/galaxy" ]; then
-    cd /galaxy
-    echo -n "Rerooting Galaxy to ${GALAXY_ROOT}... "
-    su -c "mkdir -p ${GALAXY_ROOT}" galaxy
-    tar cpz -C /galaxy . | tar xpzf - -C ${GALAXY_ROOT}
-    echo "done."
+    if [ $1 == "--reroot" ]; then
+        cd /galaxy
+        echo -n "Rerooting Galaxy to ${GALAXY_ROOT}... "
+        su -c "mkdir -p ${GALAXY_ROOT}" galaxy
+        tar cpz -C /galaxy . | tar xpzf - -C ${GALAXY_ROOT}
+        echo "done."
+        exit 0
+    fi
 
     echo -n "Updating nginx.conf... "
     sed -i 's|/galaxy/stable|'"${GALAXY_HOME}"'|g' /etc/nginx/nginx.conf
