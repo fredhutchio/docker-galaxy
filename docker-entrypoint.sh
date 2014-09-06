@@ -33,7 +33,7 @@ GALAXY_HOME="${GALAXY_ROOT}/stable"
 if [ ${GALAXY_ROOT} != "/galaxy" ]; then
     cd /galaxy
     echo -n "Rerooting Galaxy to ${GALAXY_ROOT}... "
-    mkdir -p ${GALAXY_ROOT}
+    su -c "mkdir -p ${GALAXY_ROOT}" galaxy
     tar cpz -C /galaxy . | tar xpzf - -C ${GALAXY_ROOT}
     echo "done."
 
@@ -46,7 +46,7 @@ cd ${GALAXY_ROOT}
 
 # Configure exports.
 if [ -n "${DATA_EXPORTS}" -a -n "${DATA_EXPORT_DIR}" ]; then
-    mkdir -p ${DATA_EXPORT_DIR}
+    su -c "mkdir -p ${DATA_EXPORT_DIR}" galaxy
 
     # Initialize exports from .sample files if they don't exist yet.
     for src in ${DATA_EXPORTS}; do
@@ -54,12 +54,10 @@ if [ -n "${DATA_EXPORTS}" -a -n "${DATA_EXPORT_DIR}" ]; then
             cp -a ${src}.sample ${src}
         fi
     done
-    docker-link-exports
+    su -c "docker-link-exports" galaxy
 fi
 
 cd ${GALAXY_HOME}
-chown -R galaxy:galaxy ${GALAXY_ROOT}
-chmod -R o=rX static
 
 # Set up a connection string for a database on a linked container.
 # Default: postgresql://galaxy:galaxy@HOST:PORT/galaxy
