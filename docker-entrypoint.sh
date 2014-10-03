@@ -49,7 +49,7 @@ cd ${GALAXY_ROOT}
 
 # Configure exports.
 if [ -n "${DATA_EXPORTS}" -a -n "${DATA_EXPORT_DIR}" ]; then
-    su -c "mkdir -p ${DATA_EXPORT_DIR}" galaxy
+    [ -d ${DATA_EXPORT_DIR} ] || su -c "mkdir -p ${DATA_EXPORT_DIR}" galaxy
 
     # Initialize exports from .sample files if they don't exist yet.
     for src in ${DATA_EXPORTS}; do
