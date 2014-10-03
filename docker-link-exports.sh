@@ -15,8 +15,14 @@ if [ -d ${DATA_EXPORT_DIR} ]; then
         target="${DATA_EXPORT_DIR}/${source}"
         target_dir=$(dirname $target)
 
-        # If the export doesn't exist in DATA_EXPORT_DIR, copy ours over.
-        if [ ! -e ${target} ]; then
+        if [ ! -e ${source} -a ! -e ${target} ]; then
+            echo "Neither ${source} nor ${target} exist, skipping..."
+            continue
+        fi
+
+        # If the export doesn't exist in DATA_EXPORT_DIR, copy ours
+        # over (if it exists).
+        if [ ! -e ${target} -a -e ${source} ]; then
             echo -n "Migrating ${source} to ${target}... "
             if [ -d ${source} ]; then
                 # Since most of this will be many small text files,
