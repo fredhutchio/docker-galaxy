@@ -60,29 +60,29 @@ RUN wget -qO- https://bitbucket.org/galaxy/galaxy-central/get/stable.tar.gz | \
     tar xvpz --strip-components=1 --exclude test-data
 
 # No-nonsense configuration!
-RUN cp -a config/galaxy.ini.sample universe_wsgi.ini
+RUN cp -a config/galaxy.ini.sample config/galaxy.ini
 
 # Fetch dependencies.
 RUN python scripts/fetch_eggs.py
 
 # Configure toolsheds. See https://wiki.galaxyproject.org/InstallingRepositoriesToGalaxy
-RUN cp -a config/shed_tool_conf.xml.sample shed_tool_conf.xml
-RUN sed -i 's|^#\?\(tool_config_file\) = .*$|\1 = tool_conf.xml,shed_tool_conf.xml|' universe_wsgi.ini && \
-    sed -i 's|^#\?\(tool_dependency_dir\) = .*$|\1 = ../tool_deps|' universe_wsgi.ini && \
-    sed -i 's|^#\?\(check_migrate_tools\) = .*$|\1 = False|' universe_wsgi.ini
+RUN cp -a config/shed_tool_conf.xml.sample config/shed_tool_conf.xml
+RUN sed -i 's|^#\?\(tool_config_file\) = .*$|\1 = config/tool_conf.xml,config/shed_tool_conf.xml|' config/galaxy.ini && \
+    sed -i 's|^#\?\(tool_dependency_dir\) = .*$|\1 = ../tool_deps|' config/galaxy.ini && \
+    sed -i 's|^#\?\(check_migrate_tools\) = .*$|\1 = False|' config/galaxy.ini
 
 # Ape the basic job_conf.xml.
-RUN cp -a config/job_conf.xml.sample_basic job_conf.xml
+RUN cp -a config/job_conf.xml.sample_basic config/job_conf.xml
 
 # Configure nginx to proxy requests.
 ADD nginx.conf /etc/nginx/nginx.conf
 
 # Static content will be handled by nginx, so disable it in Galaxy.
-RUN sed -i 's|^#\?\(static_enabled\) = .*$|\1 = False|' universe_wsgi.ini
+RUN sed -i 's|^#\?\(static_enabled\) = .*$|\1 = False|' config/galaxy.ini
 
 # Offload downloads and compression to nginx.
-RUN sed -i 's|^#\?\(nginx_x_accel_redirect_base\) = .*$|\1 = /_x_accel_redirect|' universe_wsgi.ini && \
-    sed -i 's|^#\?\(nginx_x_archive_files_base\) = .*$|\1 = /_x_accel_redirect|' universe_wsgi.ini
+RUN sed -i 's|^#\?\(nginx_x_accel_redirect_base\) = .*$|\1 = /_x_accel_redirect|' config/galaxy.ini && \
+    sed -i 's|^#\?\(nginx_x_archive_files_base\) = .*$|\1 = /_x_accel_redirect|' config/galaxy.ini
 
 # Switch back to root for the rest of the configuration.
 USER root

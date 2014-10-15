@@ -9,7 +9,7 @@ set -e
 
 # usage: galaxy_config database_connection "$DB_CONN"
 galaxy_config() {
-    sed -i --follow-symlinks 's|^#\?\('"$1"'\) = .*$|\1 = '"$2"'|' ${GALAXY_HOME}/universe_wsgi.ini
+    sed -i --follow-symlinks 's|^#\?\('"$1"'\) = .*$|\1 = '"$2"'|' ${GALAXY_HOME}/config/galaxy.ini
 }
 
 # usage: wait_for_ok http://example.com
