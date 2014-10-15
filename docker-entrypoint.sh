@@ -38,6 +38,13 @@ if [ ${GALAXY_ROOT} != "/galaxy" ]; then
         tar cpz -C /galaxy . | tar xpzf - -C ${GALAXY_ROOT}
         echo "done."
         exit 0
+    elif [ $1 == "--upgrade" ]; then
+        cd /galaxy/stable
+        echo -n "Upgrading Galaxy... "
+        su -c "mkdir -p ${GALAXY_HOME}" galaxy
+        tar cpz -C /galaxy/stable . | tar xpzf - -C ${GALAXY_HOME}
+        echo "done."
+        exit 0
     fi
 
     echo -n "Updating nginx.conf... "
