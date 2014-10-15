@@ -60,19 +60,19 @@ RUN wget -qO- https://bitbucket.org/galaxy/galaxy-central/get/stable.tar.gz | \
     tar xvpz --strip-components=1 --exclude test-data
 
 # No-nonsense configuration!
-RUN cp -a universe_wsgi.ini.sample universe_wsgi.ini
+RUN cp -a config/galaxy.ini.sample universe_wsgi.ini
 
 # Fetch dependencies.
 RUN python scripts/fetch_eggs.py
 
 # Configure toolsheds. See https://wiki.galaxyproject.org/InstallingRepositoriesToGalaxy
-RUN cp -a shed_tool_conf.xml.sample shed_tool_conf.xml
+RUN cp -a config/shed_tool_conf.xml.sample shed_tool_conf.xml
 RUN sed -i 's|^#\?\(tool_config_file\) = .*$|\1 = tool_conf.xml,shed_tool_conf.xml|' universe_wsgi.ini && \
     sed -i 's|^#\?\(tool_dependency_dir\) = .*$|\1 = ../tool_deps|' universe_wsgi.ini && \
     sed -i 's|^#\?\(check_migrate_tools\) = .*$|\1 = False|' universe_wsgi.ini
 
 # Ape the basic job_conf.xml.
-RUN cp -a job_conf.xml.sample_basic job_conf.xml
+RUN cp -a config/job_conf.xml.sample_basic job_conf.xml
 
 # Configure nginx to proxy requests.
 ADD nginx.conf /etc/nginx/nginx.conf
