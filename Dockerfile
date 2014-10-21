@@ -84,12 +84,18 @@ RUN sed -i 's|^#\?\(static_enabled\) = .*$|\1 = False|' config/galaxy.ini
 RUN sed -i 's|^#\?\(nginx_x_accel_redirect_base\) = .*$|\1 = /_x_accel_redirect|' config/galaxy.ini && \
     sed -i 's|^#\?\(nginx_x_archive_files_base\) = .*$|\1 = /_x_accel_redirect|' config/galaxy.ini
 
+# Install galaxy-rstudio visualization app.
+RUN git clone https://github.com/erasche/galaxy-rstudio.git config/plugins/visualizations/rstudio
+
 # Switch back to root for the rest of the configuration.
 USER root
 
 # Uncomment this line if nginx shouldn't fork into the background.
 # (i.e. if startup.sh changes).
 #RUN sed -i '1idaemon off;' /etc/nginx/nginx.conf
+
+RUN apt-get install -y -q --no-install-recommends \
+    net-tools
 
 # Set debconf back to normal.
 RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
