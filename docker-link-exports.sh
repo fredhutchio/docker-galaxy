@@ -30,7 +30,7 @@ if [ -d ${DATA_EXPORT_DIR} ]; then
                 # DATA_EXPORT_DIR is actually mounted over a network.
                 tar cpz ${source} | tar xpzf - -C ${DATA_EXPORT_DIR}
             elif [ -f ${source} ]; then
-                mkdir -p ${target_dir}
+                [ -d ${target_dir} ] || mkdir -p ${target_dir}
                 cp -a ${source} ${target}
             fi
             echo "done."
