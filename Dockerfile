@@ -85,7 +85,7 @@ RUN sed -i 's|^#\?\(nginx_x_accel_redirect_base\) = .*$|\1 = /_x_accel_redirect|
     sed -i 's|^#\?\(nginx_x_archive_files_base\) = .*$|\1 = /_x_accel_redirect|' config/galaxy.ini
 
 # Install galaxy-rstudio visualization app.
-RUN git clone https://github.com/erasche/galaxy-rstudio.git config/plugins/visualizations/rstudio
+RUN git clone https://github.com/fhcrcio/galaxy-rstudio.git config/plugins/visualizations/rstudio
 
 # Switch back to root for the rest of the configuration.
 USER root
