@@ -1,5 +1,5 @@
-FROM ubuntu:12.04
-ENV REFRESHED_AT 2014-09-04
+FROM ubuntu:14.04
+ENV REFRESHED_AT 2014-11-04
 
 MAINTAINER Brian Claywell <bclaywel@fhcrc.org>
 
