@@ -59,8 +59,9 @@ RUN mkdir database static tool-data
 RUN wget -qO- https://bitbucket.org/galaxy/galaxy-central/get/stable.tar.gz | \
     tar xvpz --strip-components=1 --exclude test-data
 
-# No-nonsense configuration!
-RUN cp -a config/galaxy.ini.sample config/galaxy.ini
+# Almost no-nonsense configuration!
+COPY handlers.ini /tmp/handlers.ini
+RUN cat /tmp/handlers.ini config/galaxy.ini.sample > config/galaxy.ini
 
 # Fetch dependencies.
 RUN python scripts/fetch_eggs.py
@@ -89,6 +90,9 @@ RUN git clone https://github.com/fhcrcio/galaxy-rstudio.git config/plugins/visua
 
 # Switch back to root for the rest of the configuration.
 USER root
+
+# Clean up after ourselves.
+RUN rm /tmp/handlers.ini
 
 # Uncomment this line if nginx shouldn't fork into the background.
 # (i.e. if startup.sh changes).
