@@ -105,8 +105,8 @@ ADD docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 ADD docker-link-exports.sh /usr/local/bin/docker-link-exports
 
 # Add startup scripts.
-ADD startup-basic.sh /galaxy/stable/startup-basic.sh
-ADD startup-custom.sh /galaxy/stable/startup-custom.sh
+ADD startup-basic.sh /usr/local/bin/startup
+RUN chmod +x /usr/local/bin/startup
 
 # Add private data for the runtime scripts to configure/use.
 # This should only be uncommented for custom builds.
@@ -119,4 +119,4 @@ EXPOSE 80
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 
 # Start the basic server by default.
-CMD ["/galaxy/stable/startup-basic.sh"]
+CMD ["/usr/local/bin/startup"]
