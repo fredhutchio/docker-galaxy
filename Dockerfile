@@ -75,6 +75,9 @@ RUN sed -i 's|^#\?\(tool_config_file\) = .*$|\1 = config/tool_conf.xml,shed_tool
 # Ape the basic job_conf.xml.
 RUN cp -a config/job_conf.xml.sample_basic config/job_conf.xml
 
+# Avoid one missing file error.
+RUN cp -a config/migrated_tools_conf.xml.sample config/migrated_tools_conf.xml
+
 # Configure nginx to proxy requests.
 ADD nginx.conf /etc/nginx/nginx.conf
 
