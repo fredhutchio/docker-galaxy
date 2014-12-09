@@ -101,4 +101,4 @@ fi
 service nginx start
 
 # Replace this shell with the supplied command (and any arguments).
-exec $@
+exec su -c "$@" galaxy
