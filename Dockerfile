@@ -56,8 +56,8 @@ WORKDIR /galaxy/stable
 # Set up /galaxy/stable.
 RUN mkdir database static tool-data
 
-# Fetch the latest source tarball from galaxy-central's stable branch.
-RUN wget -qO- https://bitbucket.org/galaxy/galaxy-central/get/stable.tar.gz | \
+# Fetch the latest source tarball from galaxy-central's 2014-10-06 release branch.
+RUN wget -qO- https://bitbucket.org/galaxy/galaxy-central/get/latest_2014.10.06.tar.gz | \
     tar xvpz --strip-components=1 --exclude test-data
 
 # No-nonsense configuration!
