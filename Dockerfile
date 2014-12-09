@@ -75,7 +75,7 @@ RUN sed -i 's|^#\?\(tool_config_file\) = .*$|\1 = config/tool_conf.xml,shed_tool
 RUN cp -a config/job_conf.xml.sample_basic config/job_conf.xml
 
 # Configure nginx to proxy requests.
-ADD nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Static content will be handled by nginx, so disable it in Galaxy.
 RUN sed -i 's|^#\?\(static_enabled\) = .*$|\1 = False|' config/galaxy.ini
@@ -101,8 +101,8 @@ RUN apt-get install -y -q --no-install-recommends \
 RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
 
 # Add entrypoint script.
-ADD docker-entrypoint.sh /usr/local/bin/docker-entrypoint
-ADD docker-link-exports.sh /usr/local/bin/docker-link-exports
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+COPY docker-link-exports.sh /usr/local/bin/docker-link-exports
 
 # Add startup scripts.
 COPY startup.sh /usr/local/bin/startup
