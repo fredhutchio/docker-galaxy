@@ -20,17 +20,18 @@ RUN apt-get update -q && \
     libatlas-base-dev \
     libblas-dev \
     liblapack-dev \
+    libxml2-dev \
+    libz-dev \
     mercurial \
+    net-tools \
+    nginx-light \
     openjdk-7-jre-headless \
+    openssh-client \
     pkg-config \
     python-dev \
     python-setuptools \
     subversion \
-    wget \
-    nginx-light \
-    libxml2-dev \
-    libz-dev \
-    openssh-client && \
+    wget && \
     apt-get clean -q
 
 # Create an unprivileged user for Galaxy to run as (and its home
@@ -93,9 +94,6 @@ USER root
 # Uncomment this line if nginx shouldn't fork into the background.
 # (i.e. if startup.sh changes).
 #RUN sed -i '1idaemon off;' /etc/nginx/nginx.conf
-
-RUN apt-get install -y -q --no-install-recommends \
-    net-tools
 
 # Set debconf back to normal.
 RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
