@@ -67,7 +67,12 @@ RUN cp -a config/galaxy.ini.sample config/galaxy.ini
 RUN python scripts/fetch_eggs.py
 
 # Configure toolsheds. See https://wiki.galaxyproject.org/InstallingRepositoriesToGalaxy
-RUN cp -a config/shed_tool_conf.xml.sample shed_tool_conf.xml
+#
+# shed_tool_conf.xml is intentionally copied to GALAXY_ROOT rather
+# than config/ because of Galaxy's inconsistent handling of a relative
+# path pointing at the shed_tools directory.
+RUN cp -a config/tool_conf.xml.sample config/tool_conf.xml && \
+    cp -a config/shed_tool_conf.xml.sample shed_tool_conf.xml
 RUN sed -i 's|^#\?\(tool_config_file\) = .*$|\1 = config/tool_conf.xml,shed_tool_conf.xml|' config/galaxy.ini && \
     sed -i 's|^#\?\(tool_dependency_dir\) = .*$|\1 = ../tool_deps|' config/galaxy.ini && \
     sed -i 's|^#\?\(check_migrate_tools\) = .*$|\1 = False|' config/galaxy.ini
