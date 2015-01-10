@@ -27,6 +27,18 @@ wait_for_ok() {
 
 #####
 
+# Remap galaxy uid and/or gid.
+
+GALAXY_UID=${GALAXY_UID:-$(id -u galaxy)}
+GALAXY_GID=${GALAXY_GID:-$(id -g galaxy)}
+
+groupmod -g ${GALAXY_GID} galaxy
+usermod -u ${GALAXY_UID} -g ${GALAXY_GID} galaxy
+
+chown -R -h galaxy:galaxy /galaxy
+
+#####
+
 GALAXY_ROOT="${GALAXY_ROOT:-/galaxy}"
 GALAXY_HOME="${GALAXY_ROOT}/stable"
 

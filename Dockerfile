@@ -34,13 +34,13 @@ RUN apt-get update -q && \
     wget && \
     apt-get clean -q
 
-# Create an unprivileged user for Galaxy to run as (and its home
-# directory). From man 8 useradd, "System users will be created with
-# no aging information in /etc/shadow, and their numeric identifiers
-# are chosen in the SYS_UID_MIN-SYS_UID_MAX range, defined in
-# /etc/login.defs, instead of UID_MIN-UID_MAX (and their GID
+# Create an unprivileged user for Galaxy to run as, its user group,
+# and its home directory. From man 8 useradd, "System users will be
+# created with no aging information in /etc/shadow, and their numeric
+# identifiers are chosen in the SYS_UID_MIN-SYS_UID_MAX range, defined
+# in /etc/login.defs, instead of UID_MIN-UID_MAX (and their GID
 # counterparts for the creation of groups)."
-RUN useradd --system -m -d /galaxy -p galaxy galaxy
+RUN useradd --system --user-group -m -d /galaxy galaxy
 
 # Do as much as work possible as the unprivileged galaxy user.
 WORKDIR /galaxy
