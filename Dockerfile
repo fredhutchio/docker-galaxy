@@ -1,6 +1,4 @@
 FROM ubuntu:14.04
-ENV REFRESHED_AT 2014-12-08
-
 MAINTAINER Brian Claywell <bclaywel@fhcrc.org>
 
 # Set debconf to noninteractive mode.
@@ -34,6 +32,9 @@ RUN apt-get update -q && \
     wget && \
     apt-get clean -q
 
+# Set debconf back to normal.
+RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
+
 # Create an unprivileged user for Galaxy to run as, its user group,
 # and its home directory. From man 8 useradd, "System users will be
 # created with no aging information in /etc/shadow, and their numeric
@@ -41,6 +42,20 @@ RUN apt-get update -q && \
 # in /etc/login.defs, instead of UID_MIN-UID_MAX (and their GID
 # counterparts for the creation of groups)."
 RUN useradd --system --user-group -m -d /galaxy galaxy
+
+# Add entrypoint script.
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+COPY docker-link-exports.sh /usr/local/bin/docker-link-exports
+
+# Add startup scripts.
+COPY startup.sh /usr/local/bin/startup
+
+# Add private data for the runtime scripts to configure/use.
+# This should only be uncommented for custom builds.
+#COPY private /root/private
+
+# Configure nginx to proxy requests.
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Do as much as work possible as the unprivileged galaxy user.
 WORKDIR /galaxy
@@ -80,9 +95,6 @@ RUN sed -i 's|^#\?\(tool_config_file\) = .*$|\1 = config/tool_conf.xml,shed_tool
 # Ape the basic job_conf.xml.
 RUN cp -a config/job_conf.xml.sample_basic config/job_conf.xml
 
-# Configure nginx to proxy requests.
-COPY nginx.conf /etc/nginx/nginx.conf
-
 # Static content will be handled by nginx, so disable it in Galaxy.
 RUN sed -i 's|^#\?\(static_enabled\) = .*$|\1 = False|' config/galaxy.ini
 
@@ -93,27 +105,8 @@ RUN sed -i 's|^#\?\(nginx_x_accel_redirect_base\) = .*$|\1 = /_x_accel_redirect|
 # Install galaxy-rstudio visualization app.
 RUN git clone https://github.com/fhcrcio/galaxy-rstudio.git config/plugins/visualizations/rstudio
 
-# Switch back to root for the rest of the configuration.
+# Switch back to root.
 USER root
-
-# Uncomment this line if nginx shouldn't fork into the background.
-# (i.e. if startup.sh changes).
-#RUN sed -i '1idaemon off;' /etc/nginx/nginx.conf
-
-# Set debconf back to normal.
-RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
-
-# Add entrypoint script.
-COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint
-COPY docker-link-exports.sh /usr/local/bin/docker-link-exports
-
-# Add startup scripts.
-COPY startup.sh /usr/local/bin/startup
-RUN chmod +x /usr/local/bin/startup
-
-# Add private data for the runtime scripts to configure/use.
-# This should only be uncommented for custom builds.
-#ADD private /root/private
 
 EXPOSE 80
 
