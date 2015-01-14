@@ -43,14 +43,14 @@ GALAXY_ROOT="${GALAXY_ROOT:-/galaxy}"
 GALAXY_HOME="${GALAXY_ROOT}/stable"
 
 if [ ${GALAXY_ROOT} != "/galaxy" ]; then
-    if [ $1 == "--reroot" ]; then
+    if [ "$1" == "--reroot" ]; then
         cd /galaxy
         echo -n "Copying /galaxy to ${GALAXY_ROOT}... "
         gosu galaxy mkdir -p ${GALAXY_ROOT}
         tar cpz -C /galaxy . | tar xpzf - -C ${GALAXY_ROOT}
         echo "done."
         exit 0
-    elif [ $1 == "--upgrade" ]; then
+    elif [ "$1" == "--upgrade" ]; then
         cd /galaxy/stable
         echo -n "Copying /galaxy/stable to ${GALAXY_HOME}... "
         gosu galaxy mkdir -p ${GALAXY_HOME}
