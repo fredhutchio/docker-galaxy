@@ -46,14 +46,14 @@ if [ ${GALAXY_ROOT} != "/galaxy" ]; then
     if [ $1 == "--reroot" ]; then
         cd /galaxy
         echo -n "Copying /galaxy to ${GALAXY_ROOT}... "
-        su -c "mkdir -p ${GALAXY_ROOT}" galaxy
+        gosu galaxy mkdir -p ${GALAXY_ROOT}
         tar cpz -C /galaxy . | tar xpzf - -C ${GALAXY_ROOT}
         echo "done."
         exit 0
     elif [ $1 == "--upgrade" ]; then
         cd /galaxy/stable
         echo -n "Copying /galaxy/stable to ${GALAXY_HOME}... "
-        su -c "mkdir -p ${GALAXY_HOME}" galaxy
+        gosu galaxy mkdir -p ${GALAXY_HOME}
         tar cpz -C /galaxy/stable . | tar xpzf - -C ${GALAXY_HOME}
         echo "done."
         exit 0
@@ -68,7 +68,7 @@ cd ${GALAXY_ROOT}
 
 # Configure exports.
 if [ -n "${DATA_EXPORTS}" -a -n "${DATA_EXPORT_DIR}" ]; then
-    [ -d ${DATA_EXPORT_DIR} ] || su -c "mkdir -p ${DATA_EXPORT_DIR}" galaxy
+    [ -d ${DATA_EXPORT_DIR} ] || gosu galaxy mkdir -p ${DATA_EXPORT_DIR}
 
     # Initialize exports from .sample files if they don't exist yet.
     for src in ${DATA_EXPORTS}; do
@@ -76,7 +76,7 @@ if [ -n "${DATA_EXPORTS}" -a -n "${DATA_EXPORT_DIR}" ]; then
             cp -a ${src}.sample ${src}
         fi
     done
-    su -c "docker-link-exports" galaxy
+    gosu galaxy docker-link-exports
 fi
 
 cd ${GALAXY_HOME}
@@ -113,4 +113,4 @@ fi
 service nginx start
 
 # Replace this shell with the supplied command (and any arguments).
-exec su -c "$@" galaxy
+gosu galaxy $@

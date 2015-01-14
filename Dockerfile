@@ -43,6 +43,10 @@ RUN echo 'debconf debconf/frontend select Dialog' | debconf-set-selections
 # counterparts for the creation of groups)."
 RUN useradd --system --user-group -m -d /galaxy galaxy
 
+# Install gosu for saner privilege dropping.
+RUN wget -qO /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/1.2/gosu-$(dpkg --print-architecture)" && \
+    chmod +x /usr/local/bin/gosu
+
 # Add entrypoint script.
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 COPY docker-link-exports.sh /usr/local/bin/docker-link-exports
