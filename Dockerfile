@@ -55,8 +55,8 @@ COPY docker-link-exports.sh /usr/local/bin/docker-link-exports
 COPY startup.sh /usr/local/bin/startup
 
 # Add private data for the runtime scripts to configure/use.
-# This should only be uncommented for custom builds.
-#COPY private /root/private
+# Do not publish this image if private data is included!
+COPY private /root/private
 
 # Configure nginx to proxy requests.
 COPY nginx.conf /etc/nginx/nginx.conf
