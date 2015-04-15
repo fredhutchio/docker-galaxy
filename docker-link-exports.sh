@@ -42,10 +42,12 @@ if [ -d ${DATA_EXPORT_DIR} ]; then
             if [ -L ${source} -a $(readlink -e ${source}) = ${target} ]; then
                 echo -n "already "
             else
-                # Unlink the source and symlink the target in.
-                source_tmp=$(mktemp -u $(dirname ${source})/$(basename ${source}).XXXX)
-                mv -f ${source} ${source_tmp}
-                ln -s $(relpath ${target} ${source_dir}) ${source} && rm -rf ${source_tmp}
+                # Archive the original and symlink the target in.
+                archive="${DATA_EXPORT_DIR}/dist-archive/${source}"
+                archive_dir=$(dirname $archive)
+                [ -d ${archive_dir} ] || mkdir -p ${archive_dir}
+                mv -f ${source} ${archive}
+                ln -s $(relpath ${target} ${source_dir}) ${source}
             fi
         else
             ln -s $(relpath ${target} ${source_dir}) ${source}
