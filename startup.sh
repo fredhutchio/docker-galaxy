@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+# If a .venv directory exists, assume it's a virtualenv to run in.
+if [ -d .venv ]; then
+    printf "Activating virtualenv at %s/.venv\n" $(pwd)
+    . .venv/bin/activate
+fi
+
 # Start the server process(es).
 servers=`sed -n 's/^\[server:\(.*\)\]/\1/  p' config/galaxy.ini | xargs echo`
 for server in $servers; do
