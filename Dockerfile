@@ -51,6 +51,7 @@ RUN wget -qO /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/downlo
 # Add entrypoint script.
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 COPY docker-link-exports.sh /usr/local/bin/docker-link-exports
+RUN chmod +x /usr/local/bin/docker-link-exports
 
 # Add startup scripts.
 COPY startup.sh /usr/local/bin/startup
