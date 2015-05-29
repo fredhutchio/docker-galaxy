@@ -81,17 +81,24 @@ fi
 
 cd ${GALAXY_HOME}
 
-# Set up a connection string for a database on a linked container.
+# Set up a base connection string for databases on a linked container.
 # Default: postgresql://galaxy:galaxy@HOST:PORT/galaxy
 if [ -n "${DB_PORT_5432_TCP_ADDR}" ]; then
-    DB_CONN="postgresql://${DB_USER:=galaxy}:${DB_PASS:=galaxy}@${DB_PORT_5432_TCP_ADDR}:${DB_PORT_5432_TCP_PORT}/${DB_DATABASE:=galaxy}"
+    DB_CONN="postgresql://${DB_USER:-galaxy}:${DB_PASS:-galaxy}@${DB_PORT_5432_TCP_ADDR}:${DB_PORT_5432_TCP_PORT}"
 fi
 
 # Configure a postgres db if $DB_CONN is set, here or otherwise.
 if [ -n "${DB_CONN}" ]; then
-    galaxy_config database_connection "${DB_CONN}"
+    galaxy_config database_connection "${DB_CONN}/${DB_DATABASE:-galaxy}"
     galaxy_config database_engine_option_server_side_cursors "True"
     galaxy_config database_engine_option_strategy "threadlocal"
+
+    # Configure a separate db for tool installation if $DB_INSTALL is set.
+    if [ -n "${DB_INSTALL}" ]; then
+        galaxy_config install_database_connection "${DB_CONN}/${DB_INSTALL}"
+        galaxy_config install_database_engine_option_server_side_cursors "True"
+        galaxy_config install_database_engine_option_strategy "threadlocal"
+    fi
 fi
 
 # Configure Galaxy admin users if $GALAXY_ADMINS is set.
