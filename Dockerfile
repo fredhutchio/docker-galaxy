@@ -18,6 +18,7 @@ RUN apt-get update -q && \
     libatlas-base-dev \
     libblas-dev \
     liblapack-dev \
+    libssl-dev \
     libxml2-dev \
     libz-dev \
     mercurial \
