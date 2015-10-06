@@ -86,9 +86,6 @@ RUN wget -qO- https://github.com/galaxyproject/galaxy/tarball/release_15.03 | \
 # No-nonsense configuration!
 RUN cp -a config/galaxy.ini.sample config/galaxy.ini
 
-# Create a clean virtualenv for Galaxy to run in.
-RUN virtualenv .venv
-
 # Fetch dependencies.
 RUN python scripts/fetch_eggs.py
 
