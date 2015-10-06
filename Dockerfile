@@ -79,8 +79,8 @@ WORKDIR /galaxy/stable
 RUN mkdir database static tool-data
 COPY generate_install_script.py /galaxy/stable/generate_install_script.py
 
-# Fetch the latest source tarball from the Galaxy release_15.03 branch.
-RUN wget -qO- https://github.com/galaxyproject/galaxy/tarball/release_15.03 | \
+# Fetch the latest source tarball from the Galaxy release_15.07 branch.
+RUN wget -qO- https://github.com/galaxyproject/galaxy/tarball/release_15.07 | \
     tar xvpz --strip-components=1
 
 # No-nonsense configuration!
