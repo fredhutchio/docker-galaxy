@@ -89,6 +89,11 @@ RUN cp -a config/galaxy.ini.sample config/galaxy.ini
 # Fetch dependencies.
 RUN python scripts/fetch_eggs.py
 
+# Configure web and worker processes.
+COPY processes.ini /galaxy/stable/config/processes.ini
+RUN sed -i -n '1,/^# ---- HTTP Server/p;/^# ---- Filters/,$p' config/galaxy.ini && \
+    sed -i -e '/^# ---- HTTP Server/r config/processes.ini' config/galaxy.ini
+
 # Configure toolsheds. See https://wiki.galaxyproject.org/InstallingRepositoriesToGalaxy
 #
 # shed_tool_conf.xml is intentionally copied to GALAXY_ROOT rather
